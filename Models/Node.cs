@@ -5,13 +5,11 @@ using System.Threading.Tasks;
 
 namespace JobScheduler.Models
 {
-    public class Job
+    public class Node
     {
-        
         public int Id { get; set; }
-        public string Path { get; set; }
-        public string Orario { get; set; }
+        public string Tipo { get; set; }
+        public string Desc { get; set; }
         public ICollection<JobNode> JobNodes { get; set; }
-
     }
 }
