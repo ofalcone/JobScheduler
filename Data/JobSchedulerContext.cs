@@ -9,10 +9,17 @@ namespace JobScheduler.Data
 {
     public class JobSchedulerContext : DbContext
     {
+        public JobSchedulerContext(DbContextOptions<JobSchedulerContext> options)
+           : base(options)
+        { }
+
         public DbSet<Job> Jobs { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        { }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) 
+            => optionsBuilder.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=JobDB;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
