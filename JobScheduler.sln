@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobScheduler", "JobScheduler.csproj", "{CDC6E1E2-BF67-4581-8988-51D147A6A3BD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CDC6E1E2-BF67-4581-8988-51D147A6A3BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDC6E1E2-BF67-4581-8988-51D147A6A3BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDC6E1E2-BF67-4581-8988-51D147A6A3BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDC6E1E2-BF67-4581-8988-51D147A6A3BD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B6168B5C-A7EA-4BC1-9D96-DECC2CA6ABE3}
+	EndGlobalSection
+EndGlobal
