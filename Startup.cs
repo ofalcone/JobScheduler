@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JobScheduler.Data;
+using JobScheduler.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,6 +33,14 @@ namespace JobScheduler
 
             services.AddDbContext<JobSchedulerContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("Default")));
+
+            //Ogni utente può avere N ruoli, il ruolo è una stringa
+            //config server per impostare dei parametri di autenticazione
+            services.AddIdentity<User, IdentityRole>(config =>
+             { config.User.RequireUniqueEmail = true; }).AddEntityFrameworkStores<JobSchedulerContext>();
+
+
+            services.AddScoped<JobSchedulerDataSeed>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -49,6 +59,9 @@ namespace JobScheduler
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            //Middleware aspnetcore.Identity.EntityFramework che filtra le richieste in base all'autenticazione
+            //Va messo prima di UseRouting e UseAuthorization
+            app.UseAuthentication();
             app.UseRouting();
 
             app.UseAuthorization();
@@ -59,6 +72,10 @@ namespace JobScheduler
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            using var scope = app.ApplicationServices.CreateScope();
+            var seed = scope.ServiceProvider.GetService<JobSchedulerDataSeed>();
+            seed.SeedAsync().Wait();
         }
     }
 }
