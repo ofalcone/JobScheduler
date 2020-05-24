@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using JobScheduler.Data;
 using JobScheduler.Models;
 using Microsoft.AspNetCore.Builder;
@@ -12,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 
 namespace JobScheduler
 {
@@ -37,10 +41,28 @@ namespace JobScheduler
             //Ogni utente può avere N ruoli, il ruolo è una stringa
             //config server per impostare dei parametri di autenticazione
             services.AddIdentity<User, IdentityRole>(config =>
-             { config.User.RequireUniqueEmail = true; }).AddEntityFrameworkStores<JobSchedulerContext>();
+             { config.User.RequireUniqueEmail = true; })
+                .AddEntityFrameworkStores<JobSchedulerContext>()
+                .AddDefaultTokenProviders();
 
+            services.AddAuthentication()
+                    .AddCookie()
+                    .AddJwtBearer(config =>
+                    {
+                        config.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Tokens:Key"])),
+                            //chi emette il jwt
+                            ValidateIssuer = false,
+                            //client che usano i jwt
+                            ValidateAudience = false,
+
+                            //tutti e due in false perche "ci serviamo" di jwt per l autenticazione
+                        };
+                    });
 
             services.AddScoped<JobSchedulerDataSeed>();
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -70,7 +92,7 @@ namespace JobScheduler
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Account}/{action=Login}/{id?}");
             });
 
             using var scope = app.ApplicationServices.CreateScope();

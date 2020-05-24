@@ -4,19 +4,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using JobScheduler.Data;
 using JobScheduler.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JobScheduler.Controllers
 {
-    public class UsersListController : Controller
+    [Authorize]
+    public class Users : Controller
     {
         private UserManager<User> _userManager;
         private JobSchedulerContext _context;
-        
-        
-        public UsersListController(UserManager<User> userManager, JobSchedulerContext context) 
+
+        public Users(UserManager<User> userManager, JobSchedulerContext context) 
         { 
             _userManager = userManager;
             _context = context;
@@ -24,7 +25,7 @@ namespace JobScheduler.Controllers
 
         // GET: UsersList
         [HttpGet]
-        public ActionResult AllUsers()
+        public ActionResult Index()
         {
             var usersList = _userManager.Users;
             return View(usersList);

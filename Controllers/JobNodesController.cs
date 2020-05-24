@@ -12,22 +12,23 @@ using Microsoft.AspNetCore.Authorization;
 namespace JobScheduler.Controllers
 {
     [Authorize]
-    public class NodesController : Controller
+    public class JobNodesController : Controller
     {
         private readonly JobSchedulerContext _context;
 
-        public NodesController(JobSchedulerContext context)
+        public JobNodesController(JobSchedulerContext context)
         {
             _context = context;
         }
 
-        // GET: Nodes
+        // GET: JobNodes
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Nodes.ToListAsync());
+            var jobSchedulerContext = _context.JobNodes.Include(j => j.Job).Include(j => j.Node);
+            return View(await jobSchedulerContext.ToListAsync());
         }
 
-        // GET: Nodes/Details/5
+        // GET: JobNodes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -35,39 +36,45 @@ namespace JobScheduler.Controllers
                 return NotFound();
             }
 
-            var node = await _context.Nodes
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (node == null)
+            var jobNode = await _context.JobNodes
+                .Include(j => j.Job)
+                .Include(j => j.Node)
+                .FirstOrDefaultAsync(m => m.JobId == id);
+            if (jobNode == null)
             {
                 return NotFound();
             }
 
-            return View(node);
+            return View(jobNode);
         }
 
-        // GET: Nodes/Create
+        // GET: JobNodes/Create
         public IActionResult Create()
         {
+            ViewData["JobId"] = new SelectList(_context.Jobs, "Id", "Id");
+            ViewData["NodeId"] = new SelectList(_context.Nodes, "Id", "Id");
             return View();
         }
 
-        // POST: Nodes/Create
+        // POST: JobNodes/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Tipo,Desc")] Node node)
+        public async Task<IActionResult> Create([Bind("JobId,NodeId")] JobNode jobNode)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(node);
+                _context.Add(jobNode);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(node);
+            ViewData["JobId"] = new SelectList(_context.Jobs, "Id", "Id", jobNode.JobId);
+            ViewData["NodeId"] = new SelectList(_context.Nodes, "Id", "Id", jobNode.NodeId);
+            return View(jobNode);
         }
 
-        // GET: Nodes/Edit/5
+        // GET: JobNodes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -75,22 +82,24 @@ namespace JobScheduler.Controllers
                 return NotFound();
             }
 
-            var node = await _context.Nodes.FindAsync(id);
-            if (node == null)
+            var jobNode = await _context.JobNodes.FindAsync(id);
+            if (jobNode == null)
             {
                 return NotFound();
             }
-            return View(node);
+            ViewData["JobId"] = new SelectList(_context.Jobs, "Id", "Id", jobNode.JobId);
+            ViewData["NodeId"] = new SelectList(_context.Nodes, "Id", "Id", jobNode.NodeId);
+            return View(jobNode);
         }
 
-        // POST: Nodes/Edit/5
+        // POST: JobNodes/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Tipo,Desc")] Node node)
+        public async Task<IActionResult> Edit(int id, [Bind("JobId,NodeId")] JobNode jobNode)
         {
-            if (id != node.Id)
+            if (id != jobNode.JobId)
             {
                 return NotFound();
             }
@@ -99,12 +108,12 @@ namespace JobScheduler.Controllers
             {
                 try
                 {
-                    _context.Update(node);
+                    _context.Update(jobNode);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!NodeExists(node.Id))
+                    if (!JobNodeExists(jobNode.JobId))
                     {
                         return NotFound();
                     }
@@ -115,10 +124,12 @@ namespace JobScheduler.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(node);
+            ViewData["JobId"] = new SelectList(_context.Jobs, "Id", "Id", jobNode.JobId);
+            ViewData["NodeId"] = new SelectList(_context.Nodes, "Id", "Id", jobNode.NodeId);
+            return View(jobNode);
         }
 
-        // GET: Nodes/Delete/5
+        // GET: JobNodes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -126,30 +137,32 @@ namespace JobScheduler.Controllers
                 return NotFound();
             }
 
-            var node = await _context.Nodes
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (node == null)
+            var jobNode = await _context.JobNodes
+                .Include(j => j.Job)
+                .Include(j => j.Node)
+                .FirstOrDefaultAsync(m => m.JobId == id);
+            if (jobNode == null)
             {
                 return NotFound();
             }
 
-            return View(node);
+            return View(jobNode);
         }
 
-        // POST: Nodes/Delete/5
+        // POST: JobNodes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var node = await _context.Nodes.FindAsync(id);
-            _context.Nodes.Remove(node);
+            var jobNode = await _context.JobNodes.FindAsync(id);
+            _context.JobNodes.Remove(jobNode);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool NodeExists(int id)
+        private bool JobNodeExists(int id)
         {
-            return _context.Nodes.Any(e => e.Id == id);
+            return _context.JobNodes.Any(e => e.JobId == id);
         }
     }
 }

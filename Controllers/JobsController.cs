@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using JobScheduler.Data;
 using JobScheduler.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace JobScheduler.Controllers
 {
+    [Authorize]
     public class JobsController : Controller
     {
         private readonly JobSchedulerContext _context;

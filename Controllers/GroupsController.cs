@@ -12,22 +12,22 @@ using Microsoft.AspNetCore.Authorization;
 namespace JobScheduler.Controllers
 {
     [Authorize]
-    public class NodesController : Controller
+    public class GroupsController : Controller
     {
         private readonly JobSchedulerContext _context;
 
-        public NodesController(JobSchedulerContext context)
+        public GroupsController(JobSchedulerContext context)
         {
             _context = context;
         }
 
-        // GET: Nodes
+        // GET: Groups
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Nodes.ToListAsync());
+            return View(await _context.Groups.ToListAsync());
         }
 
-        // GET: Nodes/Details/5
+        // GET: Groups/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -35,39 +35,39 @@ namespace JobScheduler.Controllers
                 return NotFound();
             }
 
-            var node = await _context.Nodes
+            var @group = await _context.Groups
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (node == null)
+            if (@group == null)
             {
                 return NotFound();
             }
 
-            return View(node);
+            return View(@group);
         }
 
-        // GET: Nodes/Create
+        // GET: Groups/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Nodes/Create
+        // POST: Groups/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Tipo,Desc")] Node node)
+        public async Task<IActionResult> Create([Bind("Id,Desc")] Group @group)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(node);
+                _context.Add(@group);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(node);
+            return View(@group);
         }
 
-        // GET: Nodes/Edit/5
+        // GET: Groups/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -75,22 +75,22 @@ namespace JobScheduler.Controllers
                 return NotFound();
             }
 
-            var node = await _context.Nodes.FindAsync(id);
-            if (node == null)
+            var @group = await _context.Groups.FindAsync(id);
+            if (@group == null)
             {
                 return NotFound();
             }
-            return View(node);
+            return View(@group);
         }
 
-        // POST: Nodes/Edit/5
+        // POST: Groups/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Tipo,Desc")] Node node)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Desc")] Group @group)
         {
-            if (id != node.Id)
+            if (id != @group.Id)
             {
                 return NotFound();
             }
@@ -99,12 +99,12 @@ namespace JobScheduler.Controllers
             {
                 try
                 {
-                    _context.Update(node);
+                    _context.Update(@group);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!NodeExists(node.Id))
+                    if (!GroupExists(@group.Id))
                     {
                         return NotFound();
                     }
@@ -115,10 +115,10 @@ namespace JobScheduler.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(node);
+            return View(@group);
         }
 
-        // GET: Nodes/Delete/5
+        // GET: Groups/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -126,30 +126,30 @@ namespace JobScheduler.Controllers
                 return NotFound();
             }
 
-            var node = await _context.Nodes
+            var @group = await _context.Groups
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (node == null)
+            if (@group == null)
             {
                 return NotFound();
             }
 
-            return View(node);
+            return View(@group);
         }
 
-        // POST: Nodes/Delete/5
+        // POST: Groups/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var node = await _context.Nodes.FindAsync(id);
-            _context.Nodes.Remove(node);
+            var @group = await _context.Groups.FindAsync(id);
+            _context.Groups.Remove(@group);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool NodeExists(int id)
+        private bool GroupExists(int id)
         {
-            return _context.Nodes.Any(e => e.Id == id);
+            return _context.Groups.Any(e => e.Id == id);
         }
     }
 }
