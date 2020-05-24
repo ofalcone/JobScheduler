@@ -20,8 +20,8 @@ namespace JobScheduler.Data
 
         public JobSchedulerDataSeed
             (
-            JobSchedulerContext context, 
-            UserManager<User> userManager, 
+            JobSchedulerContext context,
+            UserManager<User> userManager,
             RoleManager<IdentityRole> roleManager
             )
         {
@@ -33,47 +33,59 @@ namespace JobScheduler.Data
 
         public async Task SeedAsync()
         {
-            var r = await CreateRole();
-            var u = await CreateAdminUser();
-            await CreateAdminRole(r, u);
+            var adminRole = await CreateAdminRole();
+            var adminUser = await CreateAdminUser();
+
+            await CreateAdminRole(adminRole, adminUser);
+
             await CreateTestJobs();
             await CreateTestNodes();
             await CreateTestGroups();
-            await _context.SaveChangesAsync();
 
         }
 
-        private async Task CreateAdminRole(IdentityRole r, User u) 
+        private async Task CreateAdminRole(IdentityRole adminRole, User adminUser)
         {
-            var userRole = new IdentityUserRole<string>
-            {
-                UserId = u.Id,
-                RoleId = r.Id
-            };
-            //dbContext.UserRoles.Add(userRole);
-            await _userManager.AddToRoleAsync(u, r.Name);
+            if (adminRole == null || adminUser == null) return;
+
+            await _userManager.AddToRoleAsync(adminUser, adminRole.Name);
+
+            await TryCommit<Node>();
         }
 
-        private async Task<IdentityRole> CreateRole()
+        private async Task<IdentityRole> CreateAdminRole()
         {
             const string tipoRuolo = "Admin";
 
-            var role = new IdentityRole
+            var foundRole = await _roleManager.FindByNameAsync(tipoRuolo);
+
+            if (foundRole == null)
             {
-                Name = tipoRuolo
-            };
-            var result = await _roleManager.CreateAsync(role);
-            return  await _roleManager.FindByNameAsync(tipoRuolo);
-             
+                foundRole = new IdentityRole
+                {
+                    Name = tipoRuolo
+                };
+
+                var result = await _roleManager.CreateAsync(foundRole);
+
+                if (result.Succeeded == false)
+                {
+                    return null;
+                }
+
+                foundRole = await _roleManager.FindByNameAsync(tipoRuolo);
+
+                foundRole = await TryCommit<IdentityRole>(foundRole);
+            }
+
+            return foundRole;
         }
 
         private async Task<User> CreateAdminUser()
         {
             const string userName = "admin@jobscheduler.com";
             const string password = "Pippo92!";
-            User u = new User(); 
-
-            var user = await _userManager.FindByEmailAsync(userName);
+            User user = await _userManager.FindByEmailAsync(userName);
             if (user == null)
             {
                 user = new User
@@ -83,16 +95,19 @@ namespace JobScheduler.Data
                     FirstName = "Admin",
                     LastName = "Admini"
                 };
+
                 var result = await _userManager.CreateAsync(user, password);
-                u = await _userManager.FindByEmailAsync(userName);
-                
+                user = await _userManager.FindByEmailAsync(userName);
 
                 if (!result.Succeeded)
                 {
-                    throw new InvalidOperationException("Cannot create default user");
+                    user = null;
                 }
             }
-            return u;
+
+            user = await TryCommit<User>(user);
+
+            return user;
         }
 
         private async Task CreateTestJobs()
@@ -104,11 +119,9 @@ namespace JobScheduler.Data
                 Job job2 = new Job { Orario = "30 9 17 05 *", Path = Path.Combine("C:/temp/firefox.exe"), Description = "launch firefox" };
                 Job job3 = new Job { Orario = "30 9 17 05 *", Path = Path.Combine("C:/temp/edge.exe"), Description = "launch edge" };
 
-
-                //_context.Jobs.Add(job1);
                 _context.Jobs.AddRange(job1, job2, job3);
 
-                await _context.SaveChangesAsync();
+                await TryCommit<Job>();
             }
         }
 
@@ -122,7 +135,8 @@ namespace JobScheduler.Data
                 Node node3 = new Node { Desc = "Node3" };
 
                 _context.Nodes.AddRange(node1, node2, node3);
-                await _context.SaveChangesAsync();
+
+                await TryCommit<Node>();
             }
         }
 
@@ -135,11 +149,25 @@ namespace JobScheduler.Data
                 Group group2 = new Group { Desc = "Group2" };
 
                 _context.Groups.AddRange(group1, group2);
-                await _context.SaveChangesAsync();
+
+                await TryCommit<Group>();
             }
         }
 
-        
+        private async Task<T> TryCommit<T>(T obj = default)
+        {
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+
+                obj = default;
+            }
+
+            return obj;
+        }
     }
 
 }
