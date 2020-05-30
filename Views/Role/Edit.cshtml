@@ -1,0 +1,11 @@
+﻿<h1 class="bg-info text-white">Edit a Role</h1>
+<a asp-action="Index" class="btn btn-secondary">Back</a>
+<div asp-validation-summary="All" class="text-danger"></div>
+
+<form asp-action="Edit" method="post">
+    <div class="form-group">
+        <label for="name">Name:</label>
+        <input name="name" class="form-control" />
+    </div>
+    <button type="submit" value="Edit" class="btn btn-primary">Edit</button>
+</form>

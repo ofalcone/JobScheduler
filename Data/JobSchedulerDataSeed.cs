@@ -1,11 +1,14 @@
-﻿using JobScheduler.Models;
+﻿using JobScheduler.Infrastructure;
+using JobScheduler.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+
 
 namespace JobScheduler.Data
 {
@@ -17,17 +20,23 @@ namespace JobScheduler.Data
         private readonly JobSchedulerContext _context;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IConfiguration _configuration;
+
+
+        
 
         public JobSchedulerDataSeed
             (
             JobSchedulerContext context,
             UserManager<User> userManager,
-            RoleManager<IdentityRole> roleManager
+            RoleManager<IdentityRole> roleManager,
+            IConfiguration configuration
             )
         {
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
+            _configuration = configuration;
         }
 
 
@@ -35,13 +44,10 @@ namespace JobScheduler.Data
         {
             var adminRole = await CreateAdminRole();
             var adminUser = await CreateAdminUser();
-
             await CreateAdminRole(adminRole, adminUser);
-
             await CreateTestJobs();
             await CreateTestNodes();
             await CreateTestGroups();
-
         }
 
         private async Task CreateAdminRole(IdentityRole adminRole, User adminUser)
@@ -50,7 +56,7 @@ namespace JobScheduler.Data
 
             await _userManager.AddToRoleAsync(adminUser, adminRole.Name);
 
-            await TryCommit<Node>();
+            await UtilityDatabase.TryCommit<Node>(_context);
         }
 
         private async Task<IdentityRole> CreateAdminRole()
@@ -75,7 +81,7 @@ namespace JobScheduler.Data
 
                 foundRole = await _roleManager.FindByNameAsync(tipoRuolo);
 
-                foundRole = await TryCommit<IdentityRole>(foundRole);
+                foundRole = await UtilityDatabase.TryCommit<IdentityRole>(_context, foundRole);
             }
 
             return foundRole;
@@ -83,17 +89,21 @@ namespace JobScheduler.Data
 
         private async Task<User> CreateAdminUser()
         {
-            const string userName = "admin@jobscheduler.com";
-            const string password = "Pippo92!";
-            User user = await _userManager.FindByEmailAsync(userName);
+            string userName = _configuration["AdminUserInfo:User"];
+            string password = _configuration["AdminUserInfo:Password"];
+            string firstName = _configuration["AdminUserInfo:FirstName"];
+            string lastname = _configuration["AdminUserInfo:LastName"];
+
+
+        User user = await _userManager.FindByEmailAsync(userName);
             if (user == null)
             {
                 user = new User
                 {
                     UserName = userName,
                     Email = userName,
-                    FirstName = "Admin",
-                    LastName = "Admini"
+                    FirstName = firstName,
+                    LastName = lastname,
                 };
 
                 var result = await _userManager.CreateAsync(user, password);
@@ -105,7 +115,7 @@ namespace JobScheduler.Data
                 }
             }
 
-            user = await TryCommit<User>(user);
+            user = await UtilityDatabase.TryCommit<User>(_context,user);
 
             return user;
         }
@@ -121,7 +131,7 @@ namespace JobScheduler.Data
 
                 _context.Jobs.AddRange(job1, job2, job3);
 
-                await TryCommit<Job>();
+                await UtilityDatabase.TryCommit<Job>(_context);
             }
         }
 
@@ -136,7 +146,7 @@ namespace JobScheduler.Data
 
                 _context.Nodes.AddRange(node1, node2, node3);
 
-                await TryCommit<Node>();
+                await UtilityDatabase.TryCommit<Node>(_context);
             }
         }
 
@@ -150,23 +160,8 @@ namespace JobScheduler.Data
 
                 _context.Groups.AddRange(group1, group2);
 
-                await TryCommit<Group>();
+                await UtilityDatabase.TryCommit<Group>(_context);
             }
-        }
-
-        private async Task<T> TryCommit<T>(T obj = default)
-        {
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception)
-            {
-
-                obj = default;
-            }
-
-            return obj;
         }
     }
 

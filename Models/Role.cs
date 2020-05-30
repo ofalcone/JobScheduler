@@ -8,6 +8,5 @@ namespace JobScheduler.Models
 {
     public class Role : IdentityRole
     {
-        public int MyProperty { get; set; }
     }
 }

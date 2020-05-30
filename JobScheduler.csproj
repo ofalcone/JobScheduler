@@ -36,4 +36,8 @@
     <PackageReference Include="System.Linq" Version="4.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Views\UserRole\" />
+  </ItemGroup>
+
 </Project>

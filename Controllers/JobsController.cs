@@ -22,12 +22,14 @@ namespace JobScheduler.Controllers
         }
 
         // GET: Jobs
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Jobs.ToListAsync());
         }
 
         // GET: Jobs/Details/5
+        [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -46,6 +48,7 @@ namespace JobScheduler.Controllers
         }
 
         // GET: Jobs/Create
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
@@ -68,6 +71,7 @@ namespace JobScheduler.Controllers
         }
 
         // GET: Jobs/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)

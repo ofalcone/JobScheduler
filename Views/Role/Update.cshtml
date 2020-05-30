@@ -1,0 +1,10 @@
+﻿@model JobScheduler.ViewModels.RoleViewModel
+
+<h1 class="bg-info text-white">Update Role</h1>
+<a asp-action="Index" class="btn btn-secondary">Back</a>
+<div asp-validation-summary="All" class="text-danger"></div>
+
+<form method="post">
+    <input type="hidden" name="roleName" value="@Model.Name" />
+    <button type="submit" value="Update" class="btn btn-primary">Save</button>
+</form>
