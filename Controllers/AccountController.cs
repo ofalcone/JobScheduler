@@ -40,9 +40,8 @@ namespace JobScheduler.Controllers
         {
             if (!ModelState.IsValid) return View();
 
-            var result = await UtilityController.CallWebApi<LoginViewModel, bool>(model, "Account");
-
-            if (result)
+            var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, false);
+            if (result.Succeeded)
             {
                 if (string.IsNullOrEmpty(returnUrl))
                 {

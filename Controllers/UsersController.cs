@@ -27,9 +27,10 @@ namespace JobScheduler.Controllers
 
         // GET: Users
         [HttpGet]
-        public ActionResult Index()
+        public async Task<ActionResult> IndexAsync()
         {
-            var usersList = _userManager.Users;
+            //var usersList = _userManager.Users;
+            var usersList = await UtilityController.CallWebApi<object,List<User>>("Users", HttpMethodsEnum.GET);
             return View(usersList);
         }
 

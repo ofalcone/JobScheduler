@@ -16,7 +16,6 @@ namespace JobScheduler.Infrastructure
             }
             catch (Exception)
             {
-
                 obj = default;
             }
 
