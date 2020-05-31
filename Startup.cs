@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using JobScheduler.Data;
+using JobScheduler.Infrastructure;
 using JobScheduler.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -98,6 +99,8 @@ namespace JobScheduler
             using var scope = app.ApplicationServices.CreateScope();
             var seed = scope.ServiceProvider.GetService<JobSchedulerDataSeed>();
             seed.SeedAsync().Wait();
+
+            app.UseHttpContext();
         }
     }
 }

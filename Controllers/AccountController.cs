@@ -1,10 +1,13 @@
-﻿using JobScheduler.Models;
+﻿using JobScheduler.Infrastructure;
+using JobScheduler.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,8 +40,9 @@ namespace JobScheduler.Controllers
         {
             if (!ModelState.IsValid) return View();
 
-            var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, false);
-            if (result.Succeeded)
+            var result = await UtilityController.CallWebApi<LoginViewModel, bool>(model, "Account");
+
+            if (result)
             {
                 if (string.IsNullOrEmpty(returnUrl))
                 {
