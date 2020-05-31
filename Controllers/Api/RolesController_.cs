@@ -11,11 +11,14 @@ namespace Controllers.Api
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "Admin", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class RolesController : ControllerBase
+    public class RolesController_ : ControllerBase
     {
+
+
+
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public RolesController(RoleManager<IdentityRole> roleManager)
+        public RolesController_(RoleManager<IdentityRole> roleManager)
         {
             _roleManager = roleManager;
         }

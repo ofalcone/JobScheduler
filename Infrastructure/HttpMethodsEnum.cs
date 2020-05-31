@@ -8,8 +8,10 @@ namespace JobScheduler.Infrastructure
     public enum HttpMethodsEnum
     {
         GET,
+        GET_BY_ID,
         DELETE,
         POST, 
-        PUT
+        PUT,
+        DELETE_CONFIRMED
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using JobScheduler.Infrastructure;
 using JobScheduler.Models;
 using JobScheduler.ViewModels;
 using Microsoft.AspNetCore.Identity;
@@ -18,10 +19,8 @@ namespace JobScheduler.Controllers
             roleManager = roleMgr;
         }
 
-        public ViewResult Index() => View(roleManager.Roles);
-
+        //public ViewResult Index() => View(roleManager.Roles);
         public IActionResult Create() => View();
-       
         public IActionResult Edit() => View();
         public IActionResult Details() => View();
 
@@ -63,7 +62,7 @@ namespace JobScheduler.Controllers
         {
             if (ModelState.IsValid)
             {
-                Role role = (Role)await roleManager.FindByIdAsync(model.Name);
+                IdentityRole role = (IdentityRole)await roleManager.FindByIdAsync(model.Name);
                 if (role != null)
                     //update
                     return RedirectToAction("Index");
@@ -73,6 +72,14 @@ namespace JobScheduler.Controllers
 
             return RedirectToAction(nameof(Index));
 
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> Index()
+        {
+            //var usersList = _userManager.Users;
+            var roleList = await UtilityController.CallWebApi<object,List<IdentityRole>>("ApiRoles", HttpMethodsEnum.GET);
+            return View(roleList);
         }
 
         private void Errors(IdentityResult result)

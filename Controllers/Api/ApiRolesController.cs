@@ -13,44 +13,46 @@ namespace JobScheduler.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class ApiRolesController : ControllerBase
     {
-        private UserManager<User> _userManager;
+        private RoleManager<IdentityRole> _roleManager;
         private JobSchedulerContext _context;
 
-        public UsersController(UserManager<User> userManager, JobSchedulerContext context)
+        public ApiRolesController(RoleManager<IdentityRole> roleManager, JobSchedulerContext context)
         {
-            _userManager = userManager;
+            _roleManager = roleManager;
             _context = context;
         }
 
-        // GET: api/<UsersController>
+        // GET: api/<RolesController>
         [HttpGet]
-        public async Task<List<User>> Get()
+        public async Task<List<IdentityRole>> Get()
         {
-            return _userManager.Users.ToList();
+            var x = _roleManager.Roles.ToList();
+            return x;
         }
+        
 
-        // GET api/<UsersController>/5
+        // GET api/<ApiRolesController>/5
         [HttpGet("{id}")]
         public string Get(int id)
         {
             return "value";
         }
 
-        // POST api/<UsersController>
+        // POST api/<ApiRolesController>
         [HttpPost]
         public void Post([FromBody] string value)
         {
         }
 
-        // PUT api/<UsersController>/5
+        // PUT api/<ApiRolesController>/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
         {
         }
 
-        // DELETE api/<UsersController>/5
+        // DELETE api/<ApiRolesController>/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {

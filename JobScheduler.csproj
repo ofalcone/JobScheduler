@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\Api\RolesController_.cs" />
     <Compile Remove="Migrations\20200510151844_InitialCreate.cs" />
     <Compile Remove="Migrations\20200510151844_InitialCreate.Designer.cs" />
     <Compile Remove="Migrations\20200510152431_Initial.cs" />
@@ -32,7 +33,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.3" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.3" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
   </ItemGroup>
 

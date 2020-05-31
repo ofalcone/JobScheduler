@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using JobScheduler.Data;
 using JobScheduler.Models;
 using Microsoft.AspNetCore.Authorization;
+using JobScheduler.Infrastructure;
 
 namespace JobScheduler.Controllers
 {
@@ -25,26 +26,19 @@ namespace JobScheduler.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Jobs.ToListAsync());
+            return View(await UtilityController.CallWebApi<object,List<Job>>("ApiJobs",Infrastructure.HttpMethodsEnum.GET));
         }
 
         // GET: Jobs/Details/5
         [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            var result = await UtilityController.CallWebApi<int?, Job>("ApiJobs", HttpMethodsEnum.GET_BY_ID, id);
+            if (result == null)
             {
-                return NotFound();
+                return View(null);
             }
-
-            var job = await _context.Jobs
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (job == null)
-            {
-                return NotFound();
-            }
-
-            return View(job);
+            return View(result);
         }
 
         // GET: Jobs/Create
@@ -125,6 +119,8 @@ namespace JobScheduler.Controllers
         // GET: Jobs/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            var result = await UtilityController.CallWebApi<int?, Job>("ApiJobs", HttpMethodsEnum.DELETE, id);
+
             if (id == null)
             {
                 return NotFound();
@@ -140,14 +136,17 @@ namespace JobScheduler.Controllers
             return View(job);
         }
 
-        // POST: Jobs/Delete/5
+        // POST: Jobs/Delete/5 - Se nella view ho <input type="submit" value="Delete" -> ActionName("Delete")
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int? id)
         {
-            var job = await _context.Jobs.FindAsync(id);
-            _context.Jobs.Remove(job);
-            await _context.SaveChangesAsync();
+            var result = await UtilityController.CallWebApi<int?, Job>("ApiJobs", HttpMethodsEnum.DELETE_CONFIRMED, id);
+            if (result == null)
+            {
+                return View(null);
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
