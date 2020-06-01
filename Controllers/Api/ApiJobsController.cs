@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using JobScheduler.Data;
 using JobScheduler.Models;
+using System.Net.Http;
+using System.Text;
 
 namespace JobScheduler.Controllers.Api
 {
@@ -43,7 +45,6 @@ namespace JobScheduler.Controllers.Api
             {
                 return null;
             }
-
             return job;
         }
 
@@ -82,13 +83,44 @@ namespace JobScheduler.Controllers.Api
         // POST: api/ApiJobs
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
+        [HttpPost, Route("[action]")]
         public async Task<ActionResult<Job>> PostJob(Job job)
         {
             _context.Jobs.Add(job);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetJob", new { id = job.Id }, job);
+        }
+
+        [HttpPost, Route("[action]")]
+        public async Task<ActionResult<object>> LaunchJob(LaunchJob launchJob)
+        {
+            string slaveURl= string.Format("https://localhost:5004/api/JobExe");
+            object test = new
+            {
+                Id = launchJob.Id,
+                Path = "C:\\Users\\Orlando Falcone\\source\\repos\\ConsoleApp\\bin\\Release\\netcoreapp3.1\\publish\\ConsoleApp.exe",
+                Argument = "",
+                IdNodeList = new List<int> { 1, 2, 3 }
+
+            };
+            try
+            {
+                using (var httpClient = new System.Net.Http.HttpClient())
+                {
+                    StringContent content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(test), Encoding.UTF8, "application/json");
+                    using (var response = await httpClient.PostAsync($"{slaveURl}", content))
+                    {
+                        string apiResponse = await response.Content.ReadAsStringAsync();
+                        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<object>(apiResponse);
+                        return result;
+                    }
+                }
+            }
+            catch
+            {
+            }
+            return default;
         }
 
         // DELETE: api/ApiJobs/5

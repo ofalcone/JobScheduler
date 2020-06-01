@@ -150,6 +150,17 @@ namespace JobScheduler.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public async Task<IActionResult> Launch(LaunchJob launchJob)
+        {
+            if (launchJob == null)
+            {
+                return NotFound();
+            }
+
+            var result = await UtilityController.CallWebApi<LaunchJob, object>("ApiJobs/LaunchJob", HttpMethodsEnum.POST, launchJob);
+            return RedirectToAction(nameof(Index));
+        }
+
         private bool JobExists(int id)
         {
             return _context.Jobs.Any(e => e.Id == id);

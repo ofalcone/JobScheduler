@@ -20,8 +20,8 @@ namespace JobScheduler.Infrastructure
                         return await WebApiGet<U>(controllerName, httpClient);
                     case HttpMethodsEnum.GET_BY_ID:
                         return await WebApiGetById<T, U>(controllerName, httpClient, inputModel);
-                    case HttpMethodsEnum.DELETE:
-                        return await WebApiDelete<T, U>(controllerName, httpClient, inputModel);
+                    //case HttpMethodsEnum.DELETE:
+                        //return await WebApiDelete<T, U>(controllerName, httpClient, inputModel);
                     case HttpMethodsEnum.DELETE_CONFIRMED:
                         return await WebApiDeleteConfirm<T, U>(controllerName, httpClient, inputModel);
                     case HttpMethodsEnum.POST:
@@ -37,6 +37,10 @@ namespace JobScheduler.Infrastructure
             return default;
         }
 
+        //private static async Task<U> WebApiDelete<T, U>(string controllerName, HttpClient httpClient, T inputModel = default)
+        //{
+        //}
+
         private static async Task<U> WebApiDeleteConfirm<T, U>(string controllerName, HttpClient httpClient, T inputModel = default)
         {
             if (EqualityComparer<T>.Default.Equals(inputModel, default))
@@ -44,7 +48,6 @@ namespace JobScheduler.Infrastructure
                 //gestire gli input non validi
                 return default;
             }
-
             try
             {
                 using (var response = await httpClient.DeleteAsync($"{CurrentHttpContext.AppBaseUrl}/api/{controllerName}/{inputModel}"))
