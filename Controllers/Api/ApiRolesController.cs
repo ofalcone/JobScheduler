@@ -26,7 +26,7 @@ namespace JobScheduler.Controllers.Api
 
         // GET: api/<RolesController>
         [HttpGet]
-        public async Task<List<IdentityRole>> Get()
+        public List<IdentityRole> Get()
         {
             var x = _roleManager.Roles.ToList();
             return x;

@@ -26,7 +26,7 @@ namespace JobScheduler.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return View(await UtilityController.CallWebApi<object,List<Job>>("ApiJobs",Infrastructure.HttpMethodsEnum.GET));
+            return View(await UtilityController.CallWebApi<object,List<Job>>("ApiJobs",HttpMethodsEnum.GET));
         }
 
         // GET: Jobs/Details/5
@@ -53,15 +53,11 @@ namespace JobScheduler.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Path,Orario")] Job job)
+        public async Task<RedirectToActionResult> Create([Bind("Id,Path,Orario")] Job job)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(job);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(job);
+            var result = await UtilityController.CallWebApi<Job, object>("ApiJobs/PostJob", HttpMethodsEnum.POST, job);
+            
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Jobs/Edit/5

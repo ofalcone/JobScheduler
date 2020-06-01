@@ -26,7 +26,7 @@ namespace JobScheduler.Controllers.Api
 
         // GET: api/<UsersController>
         [HttpGet]
-        public async Task<List<User>> Get()
+        public List<User> Get()
         {
             return _userManager.Users.ToList();
         }

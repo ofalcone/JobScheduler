@@ -9,6 +9,7 @@ using JobScheduler.Data;
 using JobScheduler.Models;
 using System.Net.Http;
 using System.Text;
+using JobScheduler.Infrastructure;
 
 namespace JobScheduler.Controllers.Api
 {
@@ -25,9 +26,11 @@ namespace JobScheduler.Controllers.Api
 
         // GET: api/ApiJobs
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Job>>> GetJobs()
+        public async Task<IList<Job>> GetJobs()
         {
-            return await _context.Jobs.ToListAsync();
+            //return await _context.Jobs.ToListAsync();
+            var res = await _context.Jobs.ToListAsync();
+            return res;
         }
 
         // GET: api/ApiJobs/5
@@ -81,13 +84,14 @@ namespace JobScheduler.Controllers.Api
         }
 
         // POST: api/ApiJobs
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost, Route("[action]")]
         public async Task<ActionResult<Job>> PostJob(Job job)
         {
             _context.Jobs.Add(job);
             await _context.SaveChangesAsync();
+
+            //ScheduleJob schedule = new ScheduleJob(job.Orario, TimeZoneInfo.Local, job.Id, job.Path);
+            ScheduleJob schedule = new ScheduleJob(job.Orario, TimeZoneInfo.Local);
 
             return CreatedAtAction("GetJob", new { id = job.Id }, job);
         }
@@ -95,11 +99,17 @@ namespace JobScheduler.Controllers.Api
         [HttpPost, Route("[action]")]
         public async Task<ActionResult<object>> LaunchJob(LaunchJob launchJob)
         {
-            string slaveURl= string.Format("https://localhost:5004/api/JobExe");
+            return await Launch(launchJob);
+        }
+
+        //TODO: Spostare in utilityclass
+        public static async Task<ActionResult<object>> Launch(LaunchJob launchJob)
+        {
+            string slaveURl = string.Format("https://localhost:5004/api/JobExe");
             object test = new
             {
                 Id = launchJob.Id,
-                Path = "C:\\Users\\Orlando Falcone\\source\\repos\\ConsoleApp\\bin\\Release\\netcoreapp3.1\\publish\\ConsoleApp.exe",
+                Path = launchJob.Path,
                 Argument = "",
                 IdNodeList = new List<int> { 1, 2, 3 }
 
