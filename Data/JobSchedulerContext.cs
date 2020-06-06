@@ -17,7 +17,8 @@ namespace JobScheduler.Data
 
         public DbSet<Job> Jobs { get; set; }
         public DbSet<Node> Nodes { get; set; }
-        public DbSet<JobNode> JobNodes { get; set; }
+        //public DbSet<JobNode> JobNodes { get; set; }
+        public DbSet<JobGroup> JobGroupes { get; set; }
         public DbSet<GroupNode> GroupNodes { get; set; }
         public DbSet<Group> Groups { get; set; }
 
@@ -29,20 +30,23 @@ namespace JobScheduler.Data
             //nome nel DB
             modelBuilder.Entity<Job>().ToTable("Job");
             modelBuilder.Entity<Node>().ToTable("Node");
-            modelBuilder.Entity<JobNode>().ToTable("JobNode");
+            //modelBuilder.Entity<JobNode>().ToTable("JobNode");
+            modelBuilder.Entity<JobGroup>().ToTable("JobGroup");
             modelBuilder.Entity<GroupNode>().ToTable("GroupNode");
             modelBuilder.Entity<Group>().ToTable("Group");
 
 
 
             //chiave primaria nm
-            modelBuilder.Entity<JobNode>().HasKey(jobNode => new { jobNode.JobId, jobNode.NodeId });
+            //modelBuilder.Entity<JobNode>().HasKey(jobNode => new { jobNode.JobId, jobNode.NodeId });
 
             //collegamento job to NM
-            modelBuilder.Entity<JobNode>().HasOne(jobNode => jobNode.Job).WithMany(jobNode => jobNode.JobNodes);
+            //modelBuilder.Entity<JobNode>().HasOne(jobNode => jobNode.Job).WithMany(jobNode => jobNode.JobNodes);
+            modelBuilder.Entity<JobGroup>().HasKey(jobGroup => new { jobGroup.JobId, jobGroup.GroupId });
+            modelBuilder.Entity<JobGroup>().HasOne(jobGroup => jobGroup.Job).WithMany(jobGroup => jobGroup.JobGroupes);
+            modelBuilder.Entity<JobGroup>().HasOne(jobGroup => jobGroup.Group).WithMany(jobGroup => jobGroup.JobGroupes);
 
-            //collegamento node to NM
-            modelBuilder.Entity<JobNode>().HasOne(jobNode => jobNode.Node).WithMany(jobNode => jobNode.JobNodes);
+            //modelBuilder.Entity<JobNode>().HasOne(jobNode => jobNode.Node).WithMany(jobNode => jobNode.JobNodes);
 
             modelBuilder.Entity<GroupNode>().HasKey(groupNode => new { groupNode.GroupId, groupNode.NodeId });
             modelBuilder.Entity<GroupNode>().HasOne(groupNode => groupNode.Node).WithMany(groupNode => groupNode.GroupNodes);

@@ -24,8 +24,9 @@ namespace JobScheduler.Controllers
         // GET: JobNodes
         public async Task<IActionResult> Index()
         {
-            var jobSchedulerContext = _context.JobNodes.Include(j => j.Job).Include(j => j.Node);
-            return View(await jobSchedulerContext.ToListAsync());
+            //var jobSchedulerContext = _context.JobNodes.Include(j => j.Job).Include(j => j.Node);
+            //return View(await jobSchedulerContext.ToListAsync());
+            return View(null);
         }
 
         // GET: JobNodes/Details/5
@@ -36,16 +37,17 @@ namespace JobScheduler.Controllers
                 return NotFound();
             }
 
-            var jobNode = await _context.JobNodes
-                .Include(j => j.Job)
-                .Include(j => j.Node)
-                .FirstOrDefaultAsync(m => m.JobId == id);
-            if (jobNode == null)
-            {
-                return NotFound();
-            }
+            //var jobNode = await _context.JobNodes
+            //    .Include(j => j.Job)
+            //    .Include(j => j.Node)
+            //    .FirstOrDefaultAsync(m => m.JobId == id);
+            //if (jobNode == null)
+            //{
+            //    return NotFound();
+            //}
 
-            return View(jobNode);
+            //return View(jobNode);
+            return View(null);
         }
 
         // GET: JobNodes/Create
@@ -82,14 +84,15 @@ namespace JobScheduler.Controllers
                 return NotFound();
             }
 
-            var jobNode = await _context.JobNodes.FindAsync(id);
-            if (jobNode == null)
-            {
-                return NotFound();
-            }
-            ViewData["JobId"] = new SelectList(_context.Jobs, "Id", "Id", jobNode.JobId);
-            ViewData["NodeId"] = new SelectList(_context.Nodes, "Id", "Id", jobNode.NodeId);
-            return View(jobNode);
+            //var jobNode = await _context.JobNodes.FindAsync(id);
+            //if (jobNode == null)
+            //{
+            //    return NotFound();
+            //}
+            //ViewData["JobId"] = new SelectList(_context.Jobs, "Id", "Id", jobNode.JobId);
+            //ViewData["NodeId"] = new SelectList(_context.Nodes, "Id", "Id", jobNode.NodeId);
+            //return View(jobNode);
+            return View(null);
         }
 
         // POST: JobNodes/Edit/5
@@ -137,16 +140,17 @@ namespace JobScheduler.Controllers
                 return NotFound();
             }
 
-            var jobNode = await _context.JobNodes
-                .Include(j => j.Job)
-                .Include(j => j.Node)
-                .FirstOrDefaultAsync(m => m.JobId == id);
-            if (jobNode == null)
-            {
-                return NotFound();
-            }
+            //var jobNode = await _context.JobNodes
+            //    .Include(j => j.Job)
+            //    .Include(j => j.Node)
+            //    .FirstOrDefaultAsync(m => m.JobId == id);
+            //if (jobNode == null)
+            //{
+            //    return NotFound();
+            //}
 
-            return View(jobNode);
+            //return View(jobNode);
+            return View(null);
         }
 
         // POST: JobNodes/Delete/5
@@ -154,15 +158,17 @@ namespace JobScheduler.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var jobNode = await _context.JobNodes.FindAsync(id);
-            _context.JobNodes.Remove(jobNode);
-            await _context.SaveChangesAsync();
+            //var jobNode = await _context.JobNodes.FindAsync(id);
+            //_context.JobNodes.Remove(jobNode);
+            //await _context.SaveChangesAsync();
+            //return RedirectToAction(nameof(Index));
             return RedirectToAction(nameof(Index));
         }
 
         private bool JobNodeExists(int id)
         {
-            return _context.JobNodes.Any(e => e.JobId == id);
+            //return _context.JobNodes.Any(e => e.JobId == id);
+            return false;
         }
     }
 }

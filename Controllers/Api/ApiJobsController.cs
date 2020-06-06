@@ -29,7 +29,9 @@ namespace JobScheduler.Controllers.Api
         public async Task<IList<Job>> GetJobs()
         {
             //return await _context.Jobs.ToListAsync();
-            var res = await _context.Jobs.ToListAsync();
+            GenericCRUD<JobSchedulerContext, Job> genericCRUD = new GenericCRUD<JobSchedulerContext, Job>(_context);
+            var res = await genericCRUD.GetAll();
+            //var res = await _context.Jobs.ToListAsync();
             return res;
         }
 
