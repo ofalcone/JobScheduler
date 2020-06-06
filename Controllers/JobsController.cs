@@ -14,24 +14,22 @@ using JobScheduler.Abstract;
 namespace JobScheduler.Controllers
 {
     [Authorize]
-    public class JobsController : Controller
+    public class JobsController : MvcCrudController<JobSchedulerContext,Job>
     {
-        private readonly JobSchedulerContext _context;
-
-        public JobsController(JobSchedulerContext context) 
+        public JobsController(JobSchedulerContext context) : base(context)
         {
-            _context = context;
+            //_context = context;
         }
 
         // GET: Jobs
-        [HttpGet]
-        public async Task<IActionResult> Index()
-        {
-            GenericCrud<JobSchedulerContext, Job> genericCRUD = new GenericCrud<JobSchedulerContext, Job>(_context);
-            var listJobs = await genericCRUD.GetAll();
-            return View(listJobs);
-            //return View(await UtilityController.CallWebApi<object,List<Job>>("ApiJobs",HttpMethodsEnum.GET));
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> Index()
+        //{
+        //    GenericCrud<JobSchedulerContext, Job> genericCRUD = new GenericCrud<JobSchedulerContext, Job>(_context);
+        //    var listJobs = await genericCRUD.GetAll();
+        //    return View(listJobs);
+        //    //return View(await UtilityController.CallWebApi<object,List<Job>>("ApiJobs",HttpMethodsEnum.GET));
+        //}
 
         //// GET: Jobs/Details/5
         //[HttpGet]

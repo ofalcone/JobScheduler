@@ -37,7 +37,6 @@ namespace JobScheduler.Infrastructure
             {
                 return null;
             }
-
             return resource;
         }
 
