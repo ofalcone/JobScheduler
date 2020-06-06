@@ -32,6 +32,7 @@ namespace JobScheduler.Controllers
             //var usersList = _userManager.Users;
             var usersList = await UtilityController.CallWebApi<object,List<User>>("Users", HttpMethodsEnum.GET);
             return View(usersList);
+            
         }
 
         [HttpGet]

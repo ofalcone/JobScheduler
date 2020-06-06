@@ -39,7 +39,7 @@ namespace JobScheduler.Infrastructure
                 Id = id,
                 Path=path
             };
-            await ApiJobsController.Launch(launchJob);
+            //await ApiJobsController.Launch(launchJob);
         }
 
         public override Task StopAsync(CancellationToken cancellationToken)
