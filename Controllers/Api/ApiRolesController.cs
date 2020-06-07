@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JobScheduler.Data;
+using JobScheduler.Infrastructure;
 using JobScheduler.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -57,5 +58,6 @@ namespace JobScheduler.Controllers.Api
         public void Delete(int id)
         {
         }
+
     }
 }

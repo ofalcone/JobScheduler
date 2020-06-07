@@ -55,5 +55,6 @@ namespace JobScheduler.Data
             //per poter aggiungere la migration Identity
             base.OnModelCreating(modelBuilder);
         }
+
     }
 }

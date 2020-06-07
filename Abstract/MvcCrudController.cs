@@ -124,6 +124,5 @@ namespace JobScheduler.Abstract
             await _genericCrud.Delete(id);
             return RedirectToAction(nameof(Index));
         }
-
     }
 }

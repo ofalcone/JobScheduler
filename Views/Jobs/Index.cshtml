@@ -13,6 +13,9 @@
     <thead>
         <tr>
             <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Path)
             </th>
             <th>
@@ -25,6 +28,9 @@
 @foreach (var item in Model) {
         <tr>
             <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.Path)
             </td>
             <td>
@@ -34,7 +40,7 @@
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
-                @Html.ActionLink("Launch", "Launch", "Jobs", new { Id = item.Id, Orario = item.Orario, Path=item.Path }, null)
+                @Html.ActionLink("Launch", "Launch", "Jobs", new { Id = item.Id, Orario = item.Orario, Path = item.Path }, null)
                 @*<a asp-action="Launch" asp-all-route-data="" @Html.Action("Update me!", "Update",new {Id=item.Id,Orario=item.Orario})>Launch</a>*@
             </td>
         </tr>
