@@ -23,8 +23,6 @@ namespace JobScheduler.Data
         private readonly IConfiguration _configuration;
 
 
-        
-
         public JobSchedulerDataSeed
             (
             JobSchedulerContext context,
@@ -45,10 +43,16 @@ namespace JobScheduler.Data
             var adminRole = await CreateAdminRole();
             var adminUser = await CreateAdminUser();
             await CreateAdminRole(adminRole, adminUser);
-            await CreateTestJobs();
-            await CreateTestNodes();
-            await CreateTestGroups();
+
+            var listJobs = await CreateTestJobs();
+            var listGroups = await CreateTestGroups();
+            var listNodes = await CreateTestNodes();
+            
+            await CreateTestJobGroup(listJobs, listGroups);
+
+            await CreateTestGroupNode(listGroups, listNodes);
         }
+
 
         private async Task CreateAdminRole(IdentityRole adminRole, User adminUser)
         {
@@ -120,8 +124,10 @@ namespace JobScheduler.Data
             return user;
         }
 
-        private async Task CreateTestJobs()
+        private async Task<List<Job>> CreateTestJobs()
         {
+            List<Job> listGroups = null;
+
             var result = _context.Jobs.Count();
             if (result < 1)
             {
@@ -132,11 +138,20 @@ namespace JobScheduler.Data
                 _context.Jobs.AddRange(job1, job2, job3);
 
                 await UtilityDatabase.TryCommit<Job>(_context);
+
+                listGroups = new List<Job>
+                {
+                    job1,job2,job3
+                };
             }
+
+            return listGroups;
         }
 
-        private async Task CreateTestNodes()
+        private async Task<List<Node>> CreateTestNodes()
         {
+            List<Node> listNodes = null;
+
             var result = _context.Nodes.Count();
             if (result < 1)
             {
@@ -147,11 +162,22 @@ namespace JobScheduler.Data
                 _context.Nodes.AddRange(node1, node2, node3);
 
                 await UtilityDatabase.TryCommit<Node>(_context);
+
+                listNodes = new List<Node>
+                {
+                    node1,
+                    node2,
+                    node3
+                };
             }
+
+            return listNodes;
         }
 
-        private async Task CreateTestGroups()
+        private async Task<List<Group>> CreateTestGroups()
         {
+            List<Group> listGroups = null;
+
             var result = _context.Groups.Count();
             if (result < 1)
             {
@@ -161,8 +187,52 @@ namespace JobScheduler.Data
                 _context.Groups.AddRange(group1, group2);
 
                 await UtilityDatabase.TryCommit<Group>(_context);
+
+                listGroups = new List<Group>
+                {
+                    group1,
+                    group2
+                };
+            }
+
+            return listGroups;
+        }
+
+        private async Task CreateTestJobGroup(List<Job> listJobs, List<Group> listGroups)
+        {
+            var result = _context.JobGroupes.Count();
+            if (result < 1)
+            {
+                var job = listJobs.FirstOrDefault();
+                var group = listGroups.FirstOrDefault();
+                var jobGroup = new JobGroup
+                {
+                    Job = job,
+                    JobId = job.Id,
+                    Group = group,
+                    GroupId = group.Id
+                };
+                _context.JobGroupes.Add(jobGroup);
+                await UtilityDatabase.TryCommit<JobGroup>(_context);
+            }
+        }
+        private async Task CreateTestGroupNode(List<Group> listGroups, List<Node> listNodes)
+        {
+            var result = _context.GroupNodes.Count();
+            if (result < 1)
+            {
+                var node = listNodes.FirstOrDefault();
+                var group = listGroups.FirstOrDefault();
+                var groupNode = new GroupNode
+                {
+                    Group = group,
+                    GroupId = group.Id,
+                    Node=node,
+                    NodeId=node.Id
+                };
+                _context.GroupNodes.Add(groupNode);
+                await UtilityDatabase.TryCommit<GroupNode>(_context);
             }
         }
     }
-
 }

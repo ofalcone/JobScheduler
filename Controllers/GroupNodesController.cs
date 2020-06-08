@@ -60,7 +60,7 @@ namespace JobScheduler.Controllers
                 }
                 ).ToArray();
 
-            ViewData["GroupId"] = new SelectList(g, "Id","Desc");
+            ViewData["GroupId"] = new SelectList(g, "Id", "Desc");
             //ViewData["NodeId"] = new SelectList(n, "Id", "Desc");
             return View();
         }
@@ -91,7 +91,10 @@ namespace JobScheduler.Controllers
                 return NotFound();
             }
 
-            var groupNode = await _context.GroupNodes.FindAsync(id);
+            var groupNode = await _context.GroupNodes
+               .Include(j => j.Group)
+               .Include(j => j.Node)
+               .FirstOrDefaultAsync(m => m.GroupId == id); ;
             if (groupNode == null)
             {
                 return NotFound();

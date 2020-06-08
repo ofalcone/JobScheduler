@@ -32,7 +32,8 @@ namespace JobScheduler.Abstract
         //public async Task<IActionResult> Details(int firstId, int secondId)
         public async Task<IActionResult> Details(NmViewModel nmViewModel)
         {
-            return View(await _genericNmCrud.GetSingle(nmViewModel.FirstId, nmViewModel.SecondId));
+            var jobGroup = await _genericNmCrud.GetSingle(nmViewModel.FirstId, nmViewModel.SecondId);
+            return View(jobGroup);
             //    if (id == null)
             //    {
             //        return NotFound();

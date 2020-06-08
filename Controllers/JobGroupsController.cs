@@ -11,6 +11,7 @@ using JobScheduler.Abstract;
 
 namespace JobScheduler.Controllers
 {
+    //public class JobGroupsController : MvcNmCrudController<JobSchedulerContext, JobGroup>
     public class JobGroupsController : Controller
     {
 
@@ -20,19 +21,20 @@ namespace JobScheduler.Controllers
 
         private readonly JobSchedulerContext _context;
 
+        //public JobGroupsController(JobSchedulerContext context):base(context)
         public JobGroupsController(JobSchedulerContext context)
         {
             _context = context;
         }
 
-        // GET: JobGroups
+        //GET: JobGroups
         public async Task<IActionResult> Index()
         {
             var jobSchedulerContext = _context.JobGroupes.Include(j => j.Group).Include(j => j.Job);
             return View(await jobSchedulerContext.ToListAsync());
         }
 
-        // GET: JobGroups/Details/5
+        //GET: JobGroups/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)

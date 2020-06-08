@@ -5,7 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Views\JobNodes\**" />
+    <Content Remove="Views\JobNodes\**" />
+    <EmbeddedResource Remove="Views\JobNodes\**" />
+    <None Remove="Views\JobNodes\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Controllers\Api\RolesController_.cs" />
+    <Compile Remove="Controllers\JobNodesController.cs" />
     <Compile Remove="Migrations\20200510151844_InitialCreate.cs" />
     <Compile Remove="Migrations\20200510151844_InitialCreate.Designer.cs" />
     <Compile Remove="Migrations\20200510152431_Initial.cs" />
