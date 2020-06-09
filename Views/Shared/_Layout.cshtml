@@ -21,40 +21,41 @@
 
                         @if (User.Identity.IsAuthenticated)
                         {
-                            @if (User.IsInRole("Admin"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Users</a>
-                                </li>
-                            }
-
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">Logout [@User.Identity.Name]</a>
-                            </li>
-                            @*TODO: pensare a come fare la pagina MyDetails + scegliere se fare tutto in inglese o tutto in italiano*@
-                            @*<li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="MyDetails" asp-action="Index">My Details</a>
-                            </li>*@
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Role" asp-action="Index">Roles</a>
-                            </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Jobs" asp-action="Index">Jobs</a>
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                                        Admin
+                                    </a>
+                                    <div class="dropdown-menu">
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Users</a>
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Role" asp-action="Index">Roles</a>
+                                    </div>
+                                </li>
+                            }
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                                    Jobs
+                                </a>
+                                <div class="dropdown-menu">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Jobs" asp-action="Index">Jobs</a>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Nodes" asp-action="Index">Nodes</a>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Groups" asp-action="Index">Groups</a>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="GroupNodes" asp-action="Index">GroupNodes</a>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="JobGroups" asp-action="Index">JobGroups</a>
+
+                                </div>
                             </li>
+
+                            @*TODO: pensare a come fare la pagina MyDetails + scegliere se fare tutto in inglese o tutto in italiano*@
+                            @*<li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="MyDetails" asp-action="Index">My Details</a></li>*@
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Nodes" asp-action="Index">Nodes</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Groups" asp-action="Index">Groups</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="GroupNodes" asp-action="Index">GroupNodes</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="JobGroups" asp-action="Index">JobGroups</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">Logout [@User.Identity.Name]</a>
                             </li>
                         }
                         else

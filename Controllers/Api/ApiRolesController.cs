@@ -16,21 +16,25 @@ namespace JobScheduler.Controllers.Api
     [ApiController]
     public class ApiRolesController : ControllerBase
     {
+
+        //TODO: completare i metodi affidandosi a RolesUtility + pensare se è corretto istanziare UserUtility nel costruttore
+
         private RoleManager<IdentityRole> _roleManager;
         private JobSchedulerContext _context;
+        private RolesUtility _rolesUtility;
 
         public ApiRolesController(RoleManager<IdentityRole> roleManager, JobSchedulerContext context)
         {
             _roleManager = roleManager;
             _context = context;
+            _rolesUtility = new RolesUtility(roleManager, context);
         }
 
         // GET: api/<RolesController>
         [HttpGet]
-        public List<IdentityRole> Get()
+        public IEnumerable<IdentityRole> Get()
         {
-            var x = _roleManager.Roles.ToList();
-            return x;
+            return _rolesUtility.GetRoles();
         }
         
 

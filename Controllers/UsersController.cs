@@ -18,21 +18,21 @@ namespace JobScheduler.Controllers
     {
         private UserManager<User> _userManager;
         private JobSchedulerContext _context;
-
+        private readonly UserUtility _userUtility;
         public UsersController(UserManager<User> userManager, JobSchedulerContext context)
         {
             _userManager = userManager;
             _context = context;
+            _userUtility = new UserUtility(userManager, context);
         }
 
         // GET: Users
         [HttpGet]
-        public async Task<ActionResult> IndexAsync()
+        public ActionResult IndexAsync()
         {
             //var usersList = _userManager.Users;
-            var usersList = await UtilityController.CallWebApi<object,List<User>>("Users", HttpMethodsEnum.GET);
-            return View(usersList);
-            
+            //var usersList = await UtilityController.CallWebApi<object,List<User>>("Users", HttpMethodsEnum.GET);
+            return View(_userUtility.GetUsers());
         }
 
         [HttpGet]
@@ -56,12 +56,12 @@ namespace JobScheduler.Controllers
                 string password = userView.Password;
 
 
-                var result =await _userManager.CreateAsync(user, password);
+                var result = await _userManager.CreateAsync(user, password);
                 if (result.Succeeded == false)
                 {
-                    ModelState.AddModelError("error",result.Errors.FirstOrDefault<IdentityError>().ToString());
+                    ModelState.AddModelError("error", result.Errors.FirstOrDefault<IdentityError>().ToString());
                 }
-                await UtilityDatabase.TryCommit<User>(_context,user);
+                await UtilityDatabase.TryCommit<User>(_context, user);
             }
             return RedirectToAction("Index");
         }

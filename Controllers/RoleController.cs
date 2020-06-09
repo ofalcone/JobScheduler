@@ -19,10 +19,13 @@ namespace JobScheduler.Controllers
             roleManager = roleMgr;
         }
 
-        //public ViewResult Index() => View(roleManager.Roles);
-        public IActionResult Create() => View();
-        public IActionResult Edit() => View();
-        public IActionResult Details() => View();
+        [HttpGet]
+        public async Task<ActionResult> Index()
+        {
+            //var usersList = _userManager.Users;
+            var roleList = await UtilityController.CallWebApi<object, List<IdentityRole>>("ApiRoles", HttpMethodsEnum.GET);
+            return View(roleList);
+        }
 
         [HttpPost]
         public async Task<IActionResult> Create([Required] string name)
@@ -72,14 +75,6 @@ namespace JobScheduler.Controllers
 
             return RedirectToAction(nameof(Index));
 
-        }
-
-        [HttpGet]
-        public async Task<ActionResult> Index()
-        {
-            //var usersList = _userManager.Users;
-            var roleList = await UtilityController.CallWebApi<object,List<IdentityRole>>("ApiRoles", HttpMethodsEnum.GET);
-            return View(roleList);
         }
 
         private void Errors(IdentityResult result)

@@ -1,10 +1,10 @@
 ﻿@model IEnumerable<JobScheduler.Models.GroupNode>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = nameof(GroupNode);
 }
 
-<h1>Index</h1>
+<h1>@ViewData["Title"]</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -22,20 +22,21 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Group.Desc)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Node.Desc)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { id=item.GroupId}) |
-                @Html.ActionLink("Details", "Details", new { id = item.GroupId }) |
-                @Html.ActionLink("Delete", "Delete", new { id = item.GroupId })
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Group.Desc)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Node.Desc)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.GroupId }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.GroupId }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.GroupId })
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

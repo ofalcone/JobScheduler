@@ -1,4 +1,5 @@
-﻿using JobScheduler.Models;
+﻿using JobScheduler.Infrastructure;
+using JobScheduler.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -16,6 +17,7 @@ namespace JobScheduler.Data
     {
         private readonly JobSchedulerContext _context;
         private readonly IConfiguration _configuration;
+
         public DbContextUtility(JobSchedulerContext context, IConfiguration configuration)
         {
             _context = context;

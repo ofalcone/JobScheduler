@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JobScheduler.Data;
+using JobScheduler.Infrastructure;
 using JobScheduler.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,20 +16,20 @@ namespace JobScheduler.Controllers.Api
     [ApiController]
     public class ApiUsersController : ControllerBase
     {
-        private UserManager<User> _userManager;
-        private JobSchedulerContext _context;
+        //TODO: completare i metodi affidandosi a UserUtility + pensare se è corretto istanziare UserUtility nel costruttore
+
+        private readonly UserUtility _userUtility;
 
         public ApiUsersController(UserManager<User> userManager, JobSchedulerContext context)
         {
-            _userManager = userManager;
-            _context = context;
+            _userUtility = new UserUtility(userManager, context);
         }
 
         // GET: api/<UsersController>
         [HttpGet]
-        public List<User> Get()
+        public IEnumerable<User> Get()
         {
-            return _userManager.Users.ToList();
+            return _userUtility.GetUsers();
         }
 
         // GET api/<UsersController>/5
