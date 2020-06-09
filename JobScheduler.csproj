@@ -51,4 +51,12 @@
     <Folder Include="Views\UserRole\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Views\GroupNodes\Create.cshtml" />
+    <None Include="Views\GroupNodes\Delete.cshtml" />
+    <None Include="Views\GroupNodes\Details.cshtml" />
+    <None Include="Views\GroupNodes\Edit.cshtml" />
+    <None Include="Views\GroupNodes\Index.cshtml" />
+  </ItemGroup>
+
 </Project>

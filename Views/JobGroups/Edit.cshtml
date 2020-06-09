@@ -12,6 +12,8 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <select asp-for="JobId" class="form-control" asp-items="ViewBag.JobId"></select>
+            <select asp-for="GroupId" class="form-control" asp-items="ViewBag.GroupId"></select>
             <input type="hidden" asp-for="JobId" />
             <input type="hidden" asp-for="GroupId" />
             <div class="form-group">

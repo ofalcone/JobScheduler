@@ -12,7 +12,9 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <select asp-for="GroupId" class="form-control" asp-items="ViewBag.GroupId"></select>
             <input type="hidden" asp-for="GroupId" />
+            <select asp-for="NodeId" class="form-control" asp-items="ViewBag.NodeId"></select>
             <input type="hidden" asp-for="NodeId" />
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

@@ -14,7 +14,7 @@ using JobScheduler.Abstract;
 namespace JobScheduler.Controllers
 {
     [Authorize]
-    public class GroupsController : CrudController<JobSchedulerContext, Group>
+    public class GroupsController : MvcCrudController<JobSchedulerContext, Group>
     {
         //private readonly JobSchedulerContext _context;
 

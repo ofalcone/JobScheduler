@@ -97,8 +97,8 @@ namespace JobScheduler.Controllers
             {
                 return NotFound();
             }
-            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Id", jobGroup.GroupId);
-            ViewData["JobId"] = new SelectList(_context.Jobs, "Id", "Id", jobGroup.JobId);
+            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Desc", jobGroup.GroupId);
+            ViewData["JobId"] = new SelectList(_context.Jobs, "Id", "Description", jobGroup.JobId);
             return View(jobGroup);
         }
 
