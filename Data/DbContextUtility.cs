@@ -26,7 +26,7 @@ namespace JobScheduler.Data
 
         public async Task<object> Launch(LaunchJob launchJob)
         {
-            string slaveURl = string.Format(_configuration["SlaveUrls:Slave1-Start"]);
+            string slaveURl = string.Format(_configuration["SlaveUrls:Slave1-Launch"]);
             SlaveJobModel test = new SlaveJobModel
             {
                 Id = launchJob.Id,

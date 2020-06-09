@@ -39,8 +39,8 @@ namespace JobScheduler
             services.AddDbContext<JobSchedulerContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("Default")));
 
-            services.AddScoped<DbContextUtility>();
-            services.AddScoped<UserUtility>();
+            //services.AddScoped<DbContextUtility>();
+            //services.AddScoped<UserUtility>();
 
 
             //Ogni utente può avere N ruoli, il ruolo è una stringa
