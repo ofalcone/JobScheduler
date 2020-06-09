@@ -1,5 +1,6 @@
 ﻿using JobScheduler.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,15 +15,16 @@ namespace JobScheduler.Data
     public class DbContextUtility
     {
         private readonly JobSchedulerContext _context;
-
-        public DbContextUtility(JobSchedulerContext context)
+        private readonly IConfiguration _configuration;
+        public DbContextUtility(JobSchedulerContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         public async Task<object> Launch(LaunchJob launchJob)
         {
-            string slaveURl = string.Format("https://localhost:5004/api/JobExe");
+            string slaveURl = string.Format(_configuration["SlaveUrls:Slave1-Start"]);
             SlaveJobModel test = new SlaveJobModel
             {
                 Id = launchJob.Id,
@@ -51,9 +53,32 @@ namespace JobScheduler.Data
             }
             try
             {
-                using (var httpClient = new System.Net.Http.HttpClient())
+                using (var httpClient = new HttpClient())
                 {
                     StringContent content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(test), Encoding.UTF8, "application/json");
+                    using (var response = await httpClient.PostAsync($"{slaveURl}", content))
+                    {
+                        string apiResponse = await response.Content.ReadAsStringAsync();
+                        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<object>(apiResponse);
+                        return result;
+                    }
+                }
+            }
+            catch
+            {
+            }
+            return default;
+        }
+
+        public async Task<object> Stop(StopJob stopJob)
+        {
+            string slaveURl = string.Format(_configuration["SlaveUrls:Slave1-Stop"]);
+
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    StringContent content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(stopJob), Encoding.UTF8, "application/json");
                     using (var response = await httpClient.PostAsync($"{slaveURl}", content))
                     {
                         string apiResponse = await response.Content.ReadAsStringAsync();

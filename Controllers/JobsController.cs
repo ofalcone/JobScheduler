@@ -10,6 +10,7 @@ using JobScheduler.Models;
 using Microsoft.AspNetCore.Authorization;
 using JobScheduler.Infrastructure;
 using JobScheduler.Abstract;
+using Microsoft.Extensions.Configuration;
 
 namespace JobScheduler.Controllers
 {
@@ -17,9 +18,11 @@ namespace JobScheduler.Controllers
     public class JobsController : MvcCrudController<JobSchedulerContext,Job>
     {
         private readonly JobSchedulerContext _context;
-        public JobsController(JobSchedulerContext context) : base(context)
+        private readonly IConfiguration _configuration;
+        public JobsController(JobSchedulerContext context, IConfiguration configuration) : base(context)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         //public static async Task<ActionResult<object>> Launch(LaunchJob launchJob)
@@ -53,7 +56,7 @@ namespace JobScheduler.Controllers
         //}
         public async Task<object> Launch(LaunchJob launchJob)
         {
-            DbContextUtility dbContextUtility = new DbContextUtility(_context);
+            DbContextUtility dbContextUtility = new DbContextUtility(_context,_configuration);
             return await dbContextUtility.Launch(launchJob);
         }
     }

@@ -11,6 +11,7 @@ using System.Net.Http;
 using System.Text;
 using JobScheduler.Infrastructure;
 using JobScheduler.Abstract;
+using Microsoft.Extensions.Configuration;
 
 namespace JobScheduler.Controllers.Api
 {
@@ -19,18 +20,27 @@ namespace JobScheduler.Controllers.Api
     public class ApiJobsController : CrudController<JobSchedulerContext, Job>
     {
         private readonly JobSchedulerContext _context;
+        private readonly IConfiguration _configuration;
         //private SlaveUtility slaveUtility;
-        public ApiJobsController(JobSchedulerContext context) : base(context)
+        public ApiJobsController(JobSchedulerContext context, IConfiguration configuration) : base(context)
         {
             _context = context;
             //slaveUtility = new SlaveUtility(context);
+            _configuration = configuration;
         }
 
         [HttpPost]
         public async Task<object> Launch(LaunchJob launchJob)
         {
-            DbContextUtility dbContextUtility = new DbContextUtility(_context);
+            DbContextUtility dbContextUtility = new DbContextUtility(_context, _configuration);
             return await dbContextUtility.Launch(launchJob);
+        }
+
+        [HttpPost]
+        public async Task<object> Stop(StopJob stopJob)
+        {
+            DbContextUtility dbContextUtility = new DbContextUtility(_context, _configuration);
+            return await dbContextUtility.Stop(stopJob);
         }
 
     }
