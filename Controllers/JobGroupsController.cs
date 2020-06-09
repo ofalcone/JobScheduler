@@ -88,7 +88,11 @@ namespace JobScheduler.Controllers
                 return NotFound();
             }
 
-            var jobGroup = await _context.JobGroupes.FindAsync(id);
+            var jobGroup = await _context.JobGroupes
+             .Include(j => j.Job)
+             .Include(j => j.Group)
+             .FirstOrDefaultAsync(m => m.JobId == id);
+
             if (jobGroup == null)
             {
                 return NotFound();

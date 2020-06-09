@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JobScheduler.Controllers
 {
+    //TODO: fare i metodi con userManager e userRole qui oppure in dbcontext
     public class UserRoleController : Controller
     {
         // GET: UserRoleController

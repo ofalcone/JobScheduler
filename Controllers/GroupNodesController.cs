@@ -94,13 +94,14 @@ namespace JobScheduler.Controllers
             var groupNode = await _context.GroupNodes
                .Include(j => j.Group)
                .Include(j => j.Node)
-               .FirstOrDefaultAsync(m => m.GroupId == id); ;
+               .FirstOrDefaultAsync(m => m.GroupId == id);
+
             if (groupNode == null)
             {
                 return NotFound();
             }
-            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Id", groupNode.GroupId);
-            ViewData["NodeId"] = new SelectList(_context.Nodes, "Id", "Id", groupNode.NodeId);
+            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Desc", groupNode.GroupId);
+            ViewData["NodeId"] = new SelectList(_context.Nodes, "Id", "Desc", groupNode.NodeId);
             return View(groupNode);
         }
 
