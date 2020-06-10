@@ -13,16 +13,17 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace JobScheduler.Controllers
 {
+    //TODO: fare la struttura delle action (Edit,Delete) esattamente come in MvcCrudController (Edit richiama la View, l'edit effettiva viene fatta dopo aver confermato; idem per Delete)
     //[Authorize]
     public class UsersController : Controller
     {
-        private UserManager<User> _userManager;
-        private JobSchedulerContext _context;
+        private readonly UserManager<User> _userManager;
+        //private JobSchedulerContext _context;
         private readonly UserUtility _userUtility;
         public UsersController(UserManager<User> userManager, JobSchedulerContext context)
         {
             _userManager = userManager;
-            _context = context;
+            //_context = context;
             _userUtility = new UserUtility(userManager, context);
         }
 
@@ -47,29 +48,21 @@ namespace JobScheduler.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = new User();
+                string errorResult = await _userUtility.Create(userView);
 
-                user.UserName = userView.Email;
-                user.Email = userView.Email;
-                user.FirstName = userView.FirstName;
-                user.LastName = userView.LastName;
-                string password = userView.Password;
-
-
-                var result = await _userManager.CreateAsync(user, password);
-                if (result.Succeeded == false)
+                if (string.IsNullOrWhiteSpace(errorResult))
                 {
-                    ModelState.AddModelError("error", result.Errors.FirstOrDefault<IdentityError>().ToString());
+                    return RedirectToAction("Index");
                 }
-                await UtilityDatabase.TryCommit<User>(_context, user);
             }
-            return RedirectToAction("Index");
+            return RedirectToAction("Create");
         }
 
         [HttpPost]
         public async Task<IActionResult> Update(string id)
         {
-            User user = await _userManager.FindByIdAsync(id);
+            User user = await _userUtility.GetUserById(id);
+            
             if (user != null)
                 return View(user);
             else

@@ -41,20 +41,44 @@ namespace JobScheduler.Controllers.Api
 
         // POST api/<UsersController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Post([FromBody] UserViewModel userView)
         {
+            string errorResult = await _userUtility.Create(userView);
+
+            if (string.IsNullOrWhiteSpace(errorResult))
+            {
+                return Ok();
+            }
+
+            return BadRequest(errorResult);
         }
 
         // PUT api/<UsersController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> Put([FromBody] UserViewModel userView)
         {
+            IdentityResult result = await _userUtility.Update(userView);
+
+            if (result!=null)
+            {
+                return Ok();
+            }
+
+            return BadRequest();
         }
 
         // DELETE api/<UsersController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
+            IdentityResult result = await _userUtility.Delete(id);
+
+            if (result != null)
+            {
+                return Ok();
+            }
+
+            return BadRequest();
         }
     }
 }

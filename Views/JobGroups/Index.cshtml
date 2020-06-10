@@ -4,7 +4,7 @@
     ViewData["Title"] = nameof(JobGroup);
 }
 
-<h1>Index</h1>
+<h1>@ViewData["Title"]</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -22,20 +22,21 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Job.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Group.Desc)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { id=item.JobId  }) |
-                @Html.ActionLink("Details", "Details", new { id = item.JobId }) |
-                @Html.ActionLink("Delete", "Delete", new { id = item.JobId })
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Job.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Group.Desc)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.JobId }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.JobId }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.JobId })
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

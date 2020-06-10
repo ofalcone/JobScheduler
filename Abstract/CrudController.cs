@@ -16,7 +16,7 @@ namespace JobScheduler.Abstract
         where TResource : class, IHasId
     {
 
-        private GenericCrud<TContext, TResource> _genericCrud;
+        private readonly GenericCrud<TContext, TResource> _genericCrud;
 
         public CrudController(TContext context)
         {

@@ -1,9 +1,7 @@
 ﻿@model UserViewModel
 
-<h1 class="bg-info text-white">Create User</h1>
-<a asp-action="Index" class="btn btn-secondary">Back</a>
-<div asp-validation-summary="All" class="text-danger"></div>
-
+<h1>Create User</h1>
+<hr />
 <form method="post">
     <div class="form-group">
         <label asp-for="FirstName"></label>
@@ -38,3 +36,7 @@
 
     <button type="submit" value="Create" class="btn btn-primary">Create</button>
 </form>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>

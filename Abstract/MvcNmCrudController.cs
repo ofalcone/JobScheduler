@@ -14,7 +14,7 @@ namespace JobScheduler.Abstract
         where TContext : DbContext
         where TResource : class
     {
-        private GenericNmCrud<TContext, TResource> _genericNmCrud;
+        private readonly GenericNmCrud<TContext, TResource> _genericNmCrud;
 
 
         public MvcNmCrudController(TContext context)

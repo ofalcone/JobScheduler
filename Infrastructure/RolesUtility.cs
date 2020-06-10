@@ -9,8 +9,8 @@ namespace JobScheduler.Infrastructure
 {
     public class RolesUtility
     {
-        private RoleManager<IdentityRole> _roleManager;
-        private JobSchedulerContext _context;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly JobSchedulerContext _context;
 
         public RolesUtility(RoleManager<IdentityRole> roleManager, JobSchedulerContext context)
         {

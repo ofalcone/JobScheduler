@@ -19,14 +19,14 @@ namespace JobScheduler.Controllers.Api
 
         //TODO: completare i metodi affidandosi a RolesUtility + pensare se è corretto istanziare UserUtility nel costruttore
 
-        private RoleManager<IdentityRole> _roleManager;
-        private JobSchedulerContext _context;
-        private RolesUtility _rolesUtility;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        //private JobSchedulerContext _context;
+        private readonly RolesUtility _rolesUtility;
 
         public ApiRolesController(RoleManager<IdentityRole> roleManager, JobSchedulerContext context)
         {
             _roleManager = roleManager;
-            _context = context;
+            //_context = context;
             _rolesUtility = new RolesUtility(roleManager, context);
         }
 
