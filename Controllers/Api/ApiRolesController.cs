@@ -34,31 +34,70 @@ namespace JobScheduler.Controllers.Api
         {
             return _rolesUtility.GetRoles();
         }
-        
+
 
         // GET api/<ApiRolesController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<IActionResult> Get(string id)
         {
-            return "value";
+            IdentityRole role = await _rolesUtility.GetUserById(id);
+
+            return Ok(role);
         }
 
-        // POST api/<ApiRolesController>
+        // POST api/<UsersController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Post([FromBody] IdentityRole role)
         {
+            if (role == null)
+            {
+                return BadRequest();
+            }
+
+            string errorResult = await _rolesUtility.Create(role);
+
+            if (string.IsNullOrWhiteSpace(errorResult))
+            {
+                return Ok();
+            }
+
+            return BadRequest(errorResult);
         }
 
-        // PUT api/<ApiRolesController>/5
+        // PUT api/<UsersController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> Put([FromBody] IdentityRole role)
         {
+            if (role == null)
+            {
+                return BadRequest();
+            }
+
+            IdentityResult result = await _rolesUtility.Update(role);
+            if (result == null || result.Succeeded == false)
+            {
+                return NotFound();
+            }
+
+            return Ok(result);
         }
 
-        // DELETE api/<ApiRolesController>/5
+        // DELETE api/<UsersController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(string id)
         {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest();
+            }
+
+            IdentityResult result = await _rolesUtility.Delete(id);
+            if (result == null || result.Succeeded == false)
+            {
+                return NotFound();
+            }
+
+            return Ok();
         }
 
     }
