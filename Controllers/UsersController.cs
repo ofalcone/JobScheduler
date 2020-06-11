@@ -35,11 +35,28 @@ namespace JobScheduler.Controllers
             return View(_userUtility.GetUsers());
         }
 
+        public async Task<IActionResult> Details(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return NotFound();
+            }
+            var user = await _userUtility.GetUserById(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return View(user);
+        }
+
+
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
+
 
         // POST: Users/Create
         [HttpPost]
@@ -60,6 +77,11 @@ namespace JobScheduler.Controllers
 
         public async Task<IActionResult> Edit(string id)
         {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return NotFound();
+            }
+
             UserViewModel user = await _userUtility.GetUserById(id);
 
             if (user != null)
@@ -67,6 +89,7 @@ namespace JobScheduler.Controllers
             else
                 return RedirectToAction(nameof(Index));
         }
+
 
         // POST: Nodes/Edit/5
         [HttpPost]
@@ -86,9 +109,15 @@ namespace JobScheduler.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
         // GET: Nodes/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return NotFound();
+            }
+
             UserViewModel user = await _userUtility.GetUserById(id);
 
             if (user != null)
@@ -96,6 +125,7 @@ namespace JobScheduler.Controllers
             else
                 return RedirectToAction(nameof(Index));
         }
+
 
         // POST: Nodes/Delete/5
         [HttpPost, ActionName("Delete")]
@@ -115,6 +145,7 @@ namespace JobScheduler.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
+
 
         void Errors(IdentityResult result)
         {

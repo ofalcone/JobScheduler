@@ -63,6 +63,7 @@ namespace JobScheduler.Infrastructure
 
             UserViewModel userViewModel = new UserViewModel
             {
+                Id = id,
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,

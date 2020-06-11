@@ -47,7 +47,7 @@ namespace JobScheduler.Infrastructure
             return errorString;
         }
 
-        internal async Task<IdentityRole> GetUserById(string id)
+        internal async Task<IdentityRole> GetRoleById(string id)
         {
             IdentityRole role = await _roleManager.FindByIdAsync(id);
             if (role == null)

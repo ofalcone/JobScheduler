@@ -40,7 +40,7 @@ namespace JobScheduler.Controllers.Api
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
-            IdentityRole role = await _rolesUtility.GetUserById(id);
+            IdentityRole role = await _rolesUtility.GetRoleById(id);
 
             return Ok(role);
         }
