@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 namespace JobScheduler.Controllers
 {
     //TODO: fare la struttura delle action (Edit,Delete) esattamente come in MvcCrudController (Edit richiama la View, l'edit effettiva viene fatta dopo aver confermato; idem per Delete)
+    //TODO: controllare cosa un admin può modificare, servono altri campi??
     //[Authorize]
     public class UsersController : Controller
     {
@@ -29,10 +30,8 @@ namespace JobScheduler.Controllers
 
         // GET: Users
         [HttpGet]
-        public ActionResult IndexAsync()
+        public ActionResult Index()
         {
-            //var usersList = _userManager.Users;
-            //var usersList = await UtilityController.CallWebApi<object,List<User>>("Users", HttpMethodsEnum.GET);
             return View(_userUtility.GetUsers());
         }
 
@@ -58,32 +57,63 @@ namespace JobScheduler.Controllers
             return RedirectToAction("Create");
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Update(string id)
+
+        public async Task<IActionResult> Edit(string id)
         {
-            User user = await _userUtility.GetUserById(id);
-            
+            UserViewModel user = await _userUtility.GetUserById(id);
+
             if (user != null)
                 return View(user);
             else
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
         }
 
-        [HttpDelete]
+        // POST: Nodes/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(UserViewModel userViewModel)
+        {
+            if (userViewModel == null)
+            {
+                return NotFound();
+            }
+
+            var result = await _userUtility.Update(userViewModel);
+            if (result == null || result.Succeeded == false)
+            {
+                return View(userViewModel);
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Nodes/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
-            User user = await _userManager.FindByIdAsync(id);
+            UserViewModel user = await _userUtility.GetUserById(id);
+
             if (user != null)
-            {
-                IdentityResult result = await _userManager.DeleteAsync(user);
-                if (result.Succeeded)
-                    return RedirectToAction("Index");
-                else
-                    Errors(result);
-            }
+                return View(user);
             else
-                ModelState.AddModelError("", "User Not Found");
-            return View("Index", _userManager.Users);
+                return RedirectToAction(nameof(Index));
+        }
+
+        // POST: Nodes/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return NotFound();
+            }
+
+            var res = await _userUtility.Delete(id);
+
+            if (res == null)
+            {
+                return NotFound();
+            }
+            return RedirectToAction(nameof(Index));
         }
 
         void Errors(IdentityResult result)

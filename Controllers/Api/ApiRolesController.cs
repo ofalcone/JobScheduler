@@ -8,8 +8,6 @@ using JobScheduler.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace JobScheduler.Controllers.Api
 {
     [Route("api/[controller]")]
@@ -18,14 +16,14 @@ namespace JobScheduler.Controllers.Api
     {
 
         //TODO: completare i metodi affidandosi a RolesUtility + pensare se è corretto istanziare UserUtility nel costruttore
-
-        private readonly RoleManager<IdentityRole> _roleManager;
+        //TODO: controllare sempre il ruolo dal token JWT: solo un admin può modificare le tabelle di Roles e Users
+        //private readonly RoleManager<IdentityRole> _roleManager;
         //private JobSchedulerContext _context;
         private readonly RolesUtility _rolesUtility;
 
         public ApiRolesController(RoleManager<IdentityRole> roleManager, JobSchedulerContext context)
         {
-            _roleManager = roleManager;
+            //_roleManager = roleManager;
             //_context = context;
             _rolesUtility = new RolesUtility(roleManager, context);
         }

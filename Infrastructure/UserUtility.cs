@@ -52,31 +52,40 @@ namespace JobScheduler.Infrastructure
             return errorString;
         }
 
-        internal async Task<User> GetUserById(string id)
+        internal async Task<UserViewModel> GetUserById(string id)
         {
             User user = await _userManager.FindByIdAsync(id);
-            return user;
+            UserViewModel userViewModel = new UserViewModel
+            {
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Password = user.PasswordHash
+            };
+
+            return userViewModel;
         }
 
         internal async Task<IdentityResult> Update(UserViewModel userView)
         {
-            User updateUser = new User
+            User updateUser = await _userManager.FindByIdAsync(userView.Id);
+
+            if (updateUser == null)
             {
-                UserName = userView.Email,
-                Email = userView.Email,
-                FirstName = userView.FirstName,
-                LastName = userView.LastName,
-                PasswordHash = userView.Password
-            };
+                return null;
+            }
+            updateUser.UserName = userView.FirstName;
+            updateUser.FirstName = userView.FirstName;
+            updateUser.LastName = userView.LastName;
 
             IdentityResult identityResult = await _userManager.UpdateAsync(updateUser);
             return identityResult;
         }
 
-        internal async Task<IdentityResult> Delete(int id)
+        internal async Task<IdentityResult> Delete(string id)
         {
             IdentityResult result = null;
-            User user = await _userManager.FindByIdAsync(id.ToString());
+            User user = await _userManager.FindByIdAsync(id);
 
             if (user == null)
             {

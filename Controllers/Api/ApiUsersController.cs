@@ -69,7 +69,7 @@ namespace JobScheduler.Controllers.Api
 
         // DELETE api/<UsersController>/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(string id)
         {
             IdentityResult result = await _userUtility.Delete(id);
 
