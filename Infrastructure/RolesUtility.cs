@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace JobScheduler.Infrastructure
 {
+    //TODO: eliminato un Role cosa succede agli Users?? Mettere Disabled =1 invece di fare una delete?
     public class RolesUtility
     {
         private readonly RoleManager<IdentityRole> _roleManager;
