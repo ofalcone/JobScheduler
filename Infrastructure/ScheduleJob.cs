@@ -1,4 +1,5 @@
 ﻿using JobScheduler.Controllers.Api;
+using JobScheduler.Data;
 using JobScheduler.Models;
 using System;
 using System.Collections.Generic;
@@ -39,7 +40,10 @@ namespace JobScheduler.Infrastructure
                 Id = id,
                 Path=path
             };
-            //await ApiJobsController.Launch(launchJob);
+
+            //TODO: capire come lanciare il job usando dbContextUtility.Launch
+            //DbContextUtility dbContextUtility = new DbContextUtility(_context, _configuration);
+            //await dbContextUtility.Launch(launchJob);
         }
 
         public override Task StopAsync(CancellationToken cancellationToken)

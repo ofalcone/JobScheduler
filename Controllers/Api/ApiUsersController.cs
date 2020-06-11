@@ -17,6 +17,7 @@ namespace JobScheduler.Controllers.Api
     public class ApiUsersController : ControllerBase
     {
         //TODO: completare i metodi affidandosi a UserUtility + pensare se è corretto istanziare UserUtility nel costruttore
+        //TODO: ritornare al chiamante di questa api un oggetto che contenga un messaggio di errore se succede qualcosa di strano??
 
         private readonly UserUtility _userUtility;
 
@@ -34,15 +35,22 @@ namespace JobScheduler.Controllers.Api
 
         // GET api/<UsersController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<IActionResult> Get(string id)
         {
-            return "value";
+            UserViewModel user = await _userUtility.GetUserById(id);
+
+            return Ok(user);
         }
 
         // POST api/<UsersController>
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] UserViewModel userView)
         {
+            if (userView==null)
+            {
+                return BadRequest();
+            }
+
             string errorResult = await _userUtility.Create(userView);
 
             if (string.IsNullOrWhiteSpace(errorResult))
@@ -57,28 +65,37 @@ namespace JobScheduler.Controllers.Api
         [HttpPut("{id}")]
         public async Task<IActionResult> Put([FromBody] UserViewModel userView)
         {
-            IdentityResult result = await _userUtility.Update(userView);
-
-            if (result!=null)
+            if (userView == null)
             {
-                return Ok();
+                return BadRequest();
             }
 
-            return BadRequest();
+            IdentityResult result = await _userUtility.Update(userView);
+            if (result == null || result.Succeeded == false)
+            {
+                return NotFound();
+            }
+
+            return Ok(result);
         }
 
         // DELETE api/<UsersController>/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-            IdentityResult result = await _userUtility.Delete(id);
-
-            if (result != null)
+            if (string.IsNullOrWhiteSpace(id))
             {
-                return Ok();
+                return BadRequest();
             }
 
-            return BadRequest();
+            IdentityResult result = await _userUtility.Delete(id);
+            if (result == null || result.Succeeded == false)
+            {
+                return NotFound();
+            }
+
+            return Ok();
         }
     }
+
 }

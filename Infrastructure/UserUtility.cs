@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace JobScheduler.Infrastructure
 {
+    //TODO: scegliere come gestire gli errori, o come nella Create (errore gestito localmente) oppure nella Update (errore gestito dal chiamante)
     public class UserUtility
     {
         private readonly UserManager<User> _userManager;
@@ -55,6 +56,11 @@ namespace JobScheduler.Infrastructure
         internal async Task<UserViewModel> GetUserById(string id)
         {
             User user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return null;
+            }
+
             UserViewModel userViewModel = new UserViewModel
             {
                 Email = user.Email,
