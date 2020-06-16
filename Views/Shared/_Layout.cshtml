@@ -25,7 +25,7 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                             </li>
 
-                            @if (User.IsInRole("Admin"))
+                            @if (User.IsInRole(JobScheduler.Infrastructure.Constants.ADMIN_ROLE))
                             {
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
@@ -34,6 +34,7 @@
                                     <div class="dropdown-menu">
                                         <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Users</a>
                                         <a class="nav-link text-dark" asp-area="" asp-controller="Role" asp-action="Index">Roles</a>
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="UserRole" asp-action="Index">UsersRoles</a>
                                     </div>
                                 </li>
                             }

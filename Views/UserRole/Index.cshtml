@@ -1,4 +1,4 @@
-﻿@*@model IEnumerable<Microsoft.AspNetCore.Identity.IdentityUserRole<Microsoft.AspNetCore.Identity.>>
+﻿@model IEnumerable<JobScheduler.ViewModels.UserRoleViewModel>
 
     @{
         ViewData["Title"] = "Index";
@@ -13,10 +13,10 @@
         <thead>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.Group)
+                    @Html.DisplayNameFor(model => model.User.Email)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Node)
+                    @Html.DisplayNameFor(model => model.Role.Name)
                 </th>
                 <th></th>
             </tr>
@@ -25,17 +25,17 @@
     @foreach (var item in Model) {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Group.Id)
+                    @Html.DisplayFor(modelItem => item.User.Email)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Node.Id)
+                    @Html.DisplayFor(modelItem => item.Role.Name)
                 </td>
                 <td>
-                    @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                    @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                    @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                    @Html.ActionLink("Edit", "Edit", new {  userId=item.UserId, roleId=item.RoleId}) |
+                    @Html.ActionLink("Details", "Details", new { userId = item.UserId, roleId = item.RoleId }) |
+                    @Html.ActionLink("Delete", "Delete", new { userId = item.UserId, roleId = item.RoleId })
                 </td>
             </tr>
     }
         </tbody>
-    </table>*@
+    </table>

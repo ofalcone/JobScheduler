@@ -97,35 +97,35 @@ namespace JobScheduler.Controllers
 
 
         // GET: Nodes/Delete/5
-        public async Task<IActionResult> Delete(string id)
-        {
-            IdentityRole user = await _roleUtility.GetRoleById(id);
+        //public async Task<IActionResult> Delete(string id)
+        //{
+        //    IdentityRole user = await _roleUtility.GetRoleById(id);
 
-            if (user != null)
-                return View(user);
-            else
-                return RedirectToAction(nameof(Index));
-        }
+        //    if (user != null)
+        //        return View(user);
+        //    else
+        //        return RedirectToAction(nameof(Index));
+        //}
 
 
-        // POST: Nodes/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
-        {
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                return NotFound();
-            }
+        //// POST: Nodes/Delete/5
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> DeleteConfirmed(string id)
+        //{
+        //    if (string.IsNullOrWhiteSpace(id))
+        //    {
+        //        return NotFound();
+        //    }
 
-            var res = await _roleUtility.Delete(id);
+        //    var res = await _roleUtility.Delete(id);
 
-            if (res == null)
-            {
-                return NotFound();
-            }
-            return RedirectToAction(nameof(Index));
-        }
+        //    if (res == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return RedirectToAction(nameof(Index));
+        //}
 
     }
 }
