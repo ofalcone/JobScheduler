@@ -9,6 +9,7 @@ using JobScheduler.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace JobScheduler.Controllers
 {
@@ -26,7 +27,6 @@ namespace JobScheduler.Controllers
         }
 
 
-        // GET: UserRoleController
         public async Task<ActionResult> Index()
         {
             //var users = _userUtility.GetUsers();
@@ -40,7 +40,7 @@ namespace JobScheduler.Controllers
                 {
                     UserId = item.UserId,
                     User = await _userUtility.GetUserById(item.UserId),
-                    RoleId= item.RoleId,
+                    RoleId = item.RoleId,
                     Role = await _roleUtility.GetRoleById(item.RoleId)
                 };
 
@@ -49,9 +49,14 @@ namespace JobScheduler.Controllers
             return View(userRoleViewModels.ToArray());
         }
 
-        // GET: UserRoleController/Details/5
-        public async Task<ActionResult> Details([Bind("userId","roleId")]string userId, string roleId)
+
+        public async Task<ActionResult> Details([Bind("userId", "roleId")]string userId, string roleId)
         {
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(roleId))
+            {
+                return NotFound();
+            }
+
             var item = await _context.UserRoles.FindAsync(userId, roleId);
             UserRoleViewModel userRoleViewModel = new UserRoleViewModel
             {
@@ -64,74 +69,132 @@ namespace JobScheduler.Controllers
         }
 
         // GET: UserRoleController/Create
-        public ActionResult Create()
+        public IActionResult Create()
         {
+            var users = _userUtility.GetUsers();
+            var roles = _roleUtility.GetRoles();
+            ViewData["UserId"] = new SelectList(users, "Id", "Email");
+            ViewData["RoleId"] = new SelectList(roles, "Id", "Name");
             return View();
         }
 
-        // POST: UserRoleController/Create
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind("UserId,RoleId")] string userId,string roleId)
+        public async Task<ActionResult> Create([Bind("UserId,RoleId")] string userId, string roleId)
         {
-            if (ModelState.IsValid)
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(roleId))
             {
-                IdentityUserRole<string> identityUserRole = new IdentityUserRole<string>
-                {
-                    UserId = userId,
-                    RoleId = roleId
-                };
-
-                _context.UserRoles.Add(identityUserRole);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
-            //ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Id", groupNode.GroupId);
-            //ViewData["NodeId"] = new SelectList(_context.Nodes, "Id", "Id", groupNode.NodeId);
-            //return View(groupNode);
+
+            IdentityUserRole<string> identityUserRole = new IdentityUserRole<string>
+            {
+                UserId = userId,
+                RoleId = roleId
+            };
+
+            _context.UserRoles.Add(identityUserRole);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+
+
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: UserRoleController/Edit/5
-        public ActionResult Edit(int id)
+
+        public async Task<ActionResult> Edit([Bind("UserId,RoleId")] string userId, string roleId)
         {
-            return View();
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(roleId))
+            {
+                return NotFound();
+            }
+
+            var item = await _context.UserRoles.FindAsync(userId, roleId);
+            UserRoleViewModel userRoleViewModel = new UserRoleViewModel
+            {
+                UserId = item.UserId,
+                User = await _userUtility.GetUserById(item.UserId),
+                RoleId = item.RoleId,
+                Role = await _roleUtility.GetRoleById(item.RoleId)
+            };
+
+
+            if (userRoleViewModel == null)
+            {
+                return NotFound();
+            }
+
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Email", userRoleViewModel.UserId);
+            ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "Name", userRoleViewModel.RoleId);
+            return View(userRoleViewModel);
         }
 
-        // POST: UserRoleController/Edit/5
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<ActionResult> EditConfirmed([Bind("UserId,RoleId")] string userId, string roleId)
         {
-            try
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(roleId))
             {
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
-            catch
+            IdentityUserRole<string> identityUserRole = new IdentityUserRole<string>
             {
-                return View();
-            }
+                UserId = userId,
+                RoleId = roleId
+            };
+
+            _context.UserRoles.Update(identityUserRole);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: UserRoleController/Delete/5
-        public ActionResult Delete(int id)
+
+        public async Task<ActionResult> Delete([Bind("UserId,RoleId")] string userId, string roleId)
         {
-            return View();
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(roleId))
+            {
+                return NotFound();
+            }
+
+            var item = await _context.UserRoles.FindAsync(userId, roleId);
+            UserRoleViewModel userRoleViewModel = new UserRoleViewModel
+            {
+                UserId = item.UserId,
+                User = await _userUtility.GetUserById(item.UserId),
+                RoleId = item.RoleId,
+                Role = await _roleUtility.GetRoleById(item.RoleId)
+            };
+
+
+            if (userRoleViewModel == null)
+            {
+                return NotFound();
+            }
+            return View(userRoleViewModel);
         }
 
-        // POST: UserRoleController/Delete/5
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> DeleteConfirmed([Bind("UserId,RoleId")] string userId, string roleId)
         {
-            try
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(roleId))
             {
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
-            catch
+
+            IdentityUserRole<string> identityUserRole = new IdentityUserRole<string>
             {
-                return View();
-            }
+                UserId = userId,
+                RoleId = roleId
+            };
+
+            _context.UserRoles.Remove(identityUserRole);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }
