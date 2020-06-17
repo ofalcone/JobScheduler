@@ -19,11 +19,14 @@ namespace JobScheduler.Controllers
         private readonly JobSchedulerContext _context;
         private readonly RolesUtility _roleUtility;
         private readonly UserUtility _userUtility;
+        private readonly UserRoleUtility _userRoleUtility;
+
         public UserRoleController(JobSchedulerContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
             _userUtility = new UserUtility(userManager, context);
             _roleUtility = new RolesUtility(roleManager, context);
+            _userRoleUtility = new UserRoleUtility(_userUtility, _roleUtility, _context);
         }
 
 
@@ -31,21 +34,7 @@ namespace JobScheduler.Controllers
         {
             //var users = _userUtility.GetUsers();
             //var roles = _roleUtility.GetRoles();
-            List<UserRoleViewModel> userRoleViewModels = new List<UserRoleViewModel>();
-
-            var userRoles = _context.UserRoles.ToArray();
-            foreach (var item in userRoles)
-            {
-                UserRoleViewModel userRoleViewModel = new UserRoleViewModel
-                {
-                    UserId = item.UserId,
-                    User = await _userUtility.GetUserById(item.UserId),
-                    RoleId = item.RoleId,
-                    Role = await _roleUtility.GetRoleById(item.RoleId)
-                };
-
-                userRoleViewModels.Add(userRoleViewModel);
-            }
+            List<UserRoleViewModel> userRoleViewModels = await _userRoleUtility.GetUserRoles();
             return View(userRoleViewModels.ToArray());
         }
 
@@ -57,16 +46,10 @@ namespace JobScheduler.Controllers
                 return NotFound();
             }
 
-            var item = await _context.UserRoles.FindAsync(userId, roleId);
-            UserRoleViewModel userRoleViewModel = new UserRoleViewModel
-            {
-                UserId = item.UserId,
-                User = await _userUtility.GetUserById(item.UserId),
-                RoleId = item.RoleId,
-                Role = await _roleUtility.GetRoleById(item.RoleId)
-            };
+            UserRoleViewModel userRoleViewModel = await _userRoleUtility.GetUserRole(userId, roleId);
             return View(userRoleViewModel);
         }
+
 
         // GET: UserRoleController/Create
         public IActionResult Create()
@@ -88,37 +71,19 @@ namespace JobScheduler.Controllers
                 return NotFound();
             }
 
-            IdentityUserRole<string> identityUserRole = new IdentityUserRole<string>
-            {
-                UserId = userId,
-                RoleId = roleId
-            };
-
-            _context.UserRoles.Add(identityUserRole);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-
-
+            await _userRoleUtility.CreateUserRole(userId, roleId);
             return RedirectToAction(nameof(Index));
         }
 
-
-        public async Task<ActionResult> Edit([Bind("UserId,RoleId")] string userId, string roleId)
+       
+        public async Task<IActionResult> Edit([Bind("UserId,RoleId")] string userId, string roleId)
         {
             if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(roleId))
             {
                 return NotFound();
             }
 
-            var item = await _context.UserRoles.FindAsync(userId, roleId);
-            UserRoleViewModel userRoleViewModel = new UserRoleViewModel
-            {
-                UserId = item.UserId,
-                User = await _userUtility.GetUserById(item.UserId),
-                RoleId = item.RoleId,
-                Role = await _roleUtility.GetRoleById(item.RoleId)
-            };
-
+            var userRoleViewModel= await _userRoleUtility.GetSingle(userId, roleId);
 
             if (userRoleViewModel == null)
             {
@@ -139,17 +104,9 @@ namespace JobScheduler.Controllers
             {
                 return NotFound();
             }
-            IdentityUserRole<string> identityUserRole = new IdentityUserRole<string>
-            {
-                UserId = userId,
-                RoleId = roleId
-            };
-
-            _context.UserRoles.Update(identityUserRole);
-            await _context.SaveChangesAsync();
+            await _userRoleUtility.Update(userId, roleId);
             return RedirectToAction(nameof(Index));
         }
-
 
         public async Task<ActionResult> Delete([Bind("UserId,RoleId")] string userId, string roleId)
         {
@@ -158,14 +115,7 @@ namespace JobScheduler.Controllers
                 return NotFound();
             }
 
-            var item = await _context.UserRoles.FindAsync(userId, roleId);
-            UserRoleViewModel userRoleViewModel = new UserRoleViewModel
-            {
-                UserId = item.UserId,
-                User = await _userUtility.GetUserById(item.UserId),
-                RoleId = item.RoleId,
-                Role = await _roleUtility.GetRoleById(item.RoleId)
-            };
+            var userRoleViewModel = await _userRoleUtility.GetSingle(userId, roleId);
 
 
             if (userRoleViewModel == null)
@@ -185,16 +135,10 @@ namespace JobScheduler.Controllers
                 return NotFound();
             }
 
-            IdentityUserRole<string> identityUserRole = new IdentityUserRole<string>
-            {
-                UserId = userId,
-                RoleId = roleId
-            };
-
-            _context.UserRoles.Remove(identityUserRole);
-            await _context.SaveChangesAsync();
+            await _userRoleUtility.DeleteUserRole(userId, roleId);
 
             return RedirectToAction(nameof(Index));
         }
+     
     }
 }
