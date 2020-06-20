@@ -52,16 +52,10 @@ namespace JobScheduler.Controllers
         public IActionResult Create()
         {
             var n = _context.Nodes;
-            var g = _context.Groups.Select(
-                group => new
-                {
-                    Id = group.Id,
-                    Desc = group.Id + group.Desc
-                }
-                ).ToArray();
+            var g = _context.Groups;
 
             ViewData["GroupId"] = new SelectList(g, "Id", "Desc");
-            //ViewData["NodeId"] = new SelectList(n, "Id", "Desc");
+            ViewData["NodeId"] = new SelectList(n, "Id", "Desc");
             return View();
         }
 
@@ -137,8 +131,8 @@ namespace JobScheduler.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Id", groupNode.GroupId);
-            ViewData["NodeId"] = new SelectList(_context.Nodes, "Id", "Id", groupNode.NodeId);
+            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Desc", groupNode.GroupId);
+            ViewData["NodeId"] = new SelectList(_context.Nodes, "Id", "Desc", groupNode.NodeId);
             return View(groupNode);
         }
 
