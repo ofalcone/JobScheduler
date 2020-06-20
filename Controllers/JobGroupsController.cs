@@ -8,171 +8,136 @@ using Microsoft.EntityFrameworkCore;
 using JobScheduler.Data;
 using JobScheduler.Models;
 using JobScheduler.Abstract;
+using JobScheduler.ViewModels;
+using JobScheduler.Infrastructure;
 
 namespace JobScheduler.Controllers
 {
     //public class JobGroupsController : MvcNmCrudController<JobSchedulerContext, JobGroup>
     public class JobGroupsController : Controller
     {
-
-        //public JobGroupsController(JobSchedulerContext context):base(context)
-        //{
-        //}
-
         private readonly JobSchedulerContext _context;
+        private readonly JobGroupsUtility _jobGroupsUtility;
 
         //public JobGroupsController(JobSchedulerContext context):base(context)
         public JobGroupsController(JobSchedulerContext context)
         {
             _context = context;
+            _jobGroupsUtility = new JobGroupsUtility(context);
         }
 
-        //GET: JobGroups
+
         public async Task<IActionResult> Index()
         {
-            var jobSchedulerContext = _context.JobGroupes.Include(j => j.Group).Include(j => j.Job);
-            return View(await jobSchedulerContext.ToListAsync());
+            List<JobGroup> list = await _jobGroupsUtility.GetAll();
+            return View(list);
         }
 
-        //GET: JobGroups/Details/5
-        public async Task<IActionResult> Details(int? id)
+
+        public async Task<IActionResult> Details(JobGroup jobGroup)
         {
-            if (id == null)
+            bool exist = await _jobGroupsUtility.JobGroupExists(jobGroup);
+
+            if (!exist)
             {
                 return NotFound();
             }
 
-            var jobGroup = await _context.JobGroupes
-                .Include(j => j.Group)
-                .Include(j => j.Job)
-                .FirstOrDefaultAsync(m => m.JobId == id);
-            if (jobGroup == null)
-            {
-                return NotFound();
-            }
-
+            jobGroup.Group = await _context.Groups.FindAsync(jobGroup.GroupId);
+            jobGroup.Job = await _context.Jobs.FindAsync(jobGroup.JobId);
             return View(jobGroup);
         }
 
-        // GET: JobGroups/Create
+
         public IActionResult Create()
         {
-            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Id");
-            ViewData["JobId"] = new SelectList(_context.Jobs, "Id", "Id");
+            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Desc");
+            ViewData["JobId"] = new SelectList(_context.Jobs, "Id", "Description");
             return View();
         }
 
-        // POST: JobGroups/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("JobId,GroupId")] JobGroup jobGroup)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(jobGroup);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Id", jobGroup.GroupId);
-            ViewData["JobId"] = new SelectList(_context.Jobs, "Id", "Id", jobGroup.JobId);
-            return View(jobGroup);
-        }
+            //TODO: gestione errori
 
-        // GET: JobGroups/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var jobGroup = await _context.JobGroupes
-             .Include(j => j.Job)
-             .Include(j => j.Group)
-             .FirstOrDefaultAsync(m => m.JobId == id);
-
-            if (jobGroup == null)
-            {
-                return NotFound();
-            }
-            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Desc", jobGroup.GroupId);
-            ViewData["JobId"] = new SelectList(_context.Jobs, "Id", "Description", jobGroup.JobId);
-            return View(jobGroup);
-        }
-
-        // POST: JobGroups/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("JobId,GroupId")] JobGroup jobGroup)
-        {
-            if (id != jobGroup.JobId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(jobGroup);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!JobGroupExists(jobGroup.JobId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Id", jobGroup.GroupId);
-            ViewData["JobId"] = new SelectList(_context.Jobs, "Id", "Id", jobGroup.JobId);
-            return View(jobGroup);
-        }
-
-        // GET: JobGroups/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var jobGroup = await _context.JobGroupes
-                .Include(j => j.Group)
-                .Include(j => j.Job)
-                .FirstOrDefaultAsync(m => m.JobId == id);
-            if (jobGroup == null)
-            {
-                return NotFound();
-            }
-
-            return View(jobGroup);
-        }
-
-        // POST: JobGroups/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var jobGroup = await _context.JobGroupes.FindAsync(id);
-            _context.JobGroupes.Remove(jobGroup);
+            _context.Add(jobGroup);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool JobGroupExists(int id)
+
+        public async Task<IActionResult> Edit(JobGroup jobGroup)
         {
-            return _context.JobGroupes.Any(e => e.JobId == id);
+            bool exist = await _jobGroupsUtility.JobGroupExists(jobGroup);
+
+            if (!exist)
+            {
+                return NotFound();
+            }
+
+            JobGroupViewModel jobGroupViewModel = new JobGroupViewModel
+            {
+                OldJobId = jobGroup.JobId,
+                OldGroupId = jobGroup.GroupId
+            };
+
+            ViewData["JobId"] = new SelectList(_context.Jobs, "Id", "Description", jobGroup.JobId);
+            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Desc", jobGroup.GroupId);
+
+            return View(jobGroupViewModel);
         }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit([Bind("OldJobId,OldGroupId,NewJobId,NewGroupId")]JobGroupViewModel jobGroupViewModel)
+        {
+            try
+            {
+                await _jobGroupsUtility.Update(jobGroupViewModel);
+            }
+            catch
+            {
+                return NotFound();
+            }
+            return RedirectToAction(nameof(Index));
+
+        }
+
+
+        public async Task<IActionResult> Delete(JobGroup jobGroup)
+        {
+            bool exist = await _jobGroupsUtility.JobGroupExists(jobGroup);
+
+            if (!exist)
+            {
+                return NotFound();
+            }
+
+            //TODO: scegliere tra 1: a ogni chiamata portarsi dietro un oggetto JobGroup già riempito; 2- chiamare ogni volta il db
+            jobGroup.Group = await _context.Groups.FindAsync(jobGroup.GroupId);
+            jobGroup.Job = await _context.Jobs.FindAsync(jobGroup.JobId);
+            return View(jobGroup);
+        }
+
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed([Bind("JobId,GroupId")]int jobId, int groupId)
+        {
+            try
+            {
+                await _jobGroupsUtility.Delete(jobId, groupId);
+            }
+            catch
+            {
+                return NotFound();
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }

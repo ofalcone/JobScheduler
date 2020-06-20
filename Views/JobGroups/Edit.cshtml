@@ -1,4 +1,4 @@
-﻿@model JobScheduler.Models.JobGroup
+﻿@model JobScheduler.ViewModels.JobGroupViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -12,11 +12,13 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <select asp-for="JobId" class="form-control" asp-items="ViewBag.JobId"></select>
-            <select asp-for="GroupId" class="form-control" asp-items="ViewBag.GroupId"></select>
-            <input type="hidden" asp-for=@Model />
-            <input type="hidden" asp-for="JobId" />
-            <input type="hidden" asp-for="GroupId" />
+            <select asp-for="OldJobId" class="form-control" asp-items="ViewBag.JobId"></select>
+            <select asp-for="OldGroupId" class="form-control" asp-items="ViewBag.GroupId"></select>
+
+            <input type="hidden" asp-for="NewJobId" />
+            <input type="hidden" asp-for="NewGroupId" />
+            <input type="hidden" asp-for="OldJobId" />
+            <input type="hidden" asp-for="OldGroupId" />
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
@@ -26,4 +28,4 @@
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
-    
+
