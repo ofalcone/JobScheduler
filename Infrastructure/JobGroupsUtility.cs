@@ -19,10 +19,10 @@ namespace JobScheduler.Infrastructure
             _context = context;
         }
 
-        internal async Task<List<JobGroup>> GetAll()
+        internal async Task<IEnumerable<JobGroup>> GetAll()
         {
             var jobSchedulerContext = _context.JobGroupes.Include(j => j.Group).Include(j => j.Job);
-            var list = await jobSchedulerContext.ToListAsync();
+            var list = await jobSchedulerContext.ToArrayAsync();
             return list;
         }
 
@@ -33,7 +33,19 @@ namespace JobScheduler.Infrastructure
                 return null;
             }
 
+            //bool exist = await _jobGroupsUtility.JobGroupExists(jobGroup);
+
+            //jobGroup.Group = await _context.Groups.FindAsync(jobGroup.GroupId);
+            //jobGroup.Job = await _context.Jobs.FindAsync(jobGroup.JobId);
+
             return await _context.JobGroupes.FindAsync(jobGroup);
+        }
+
+
+        internal async Task CreateSingle(JobGroup jobGroup)
+        {
+            _context.JobGroupes.Add(jobGroup);
+            await _context.SaveChangesAsync();
         }
 
         internal async Task<bool> JobGroupExists(JobGroup jobGroup)

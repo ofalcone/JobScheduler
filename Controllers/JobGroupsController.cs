@@ -29,25 +29,22 @@ namespace JobScheduler.Controllers
 
         public async Task<IActionResult> Index()
         {
-            List<JobGroup> list = await _jobGroupsUtility.GetAll();
-            return View(list);
+            return View(await _jobGroupsUtility.GetAll());
         }
 
 
         public async Task<IActionResult> Details(JobGroup jobGroup)
         {
-            bool exist = await _jobGroupsUtility.JobGroupExists(jobGroup);
+            //TODO gestire errori
+            var jobGroupFound = await _jobGroupsUtility.GetSingle(jobGroup);
 
-            if (!exist)
-            {
-                return NotFound();
-            }
+            jobGroupFound.Group = await _context.Groups.FindAsync(jobGroup.GroupId);
+            jobGroupFound.Job = await _context.Jobs.FindAsync(jobGroup.JobId);
 
-            jobGroup.Group = await _context.Groups.FindAsync(jobGroup.GroupId);
-            jobGroup.Job = await _context.Jobs.FindAsync(jobGroup.JobId);
             return View(jobGroup);
         }
 
+     
 
         public IActionResult Create()
         {
@@ -63,12 +60,11 @@ namespace JobScheduler.Controllers
         {
             //TODO: gestione errori
 
-            _context.Add(jobGroup);
-            await _context.SaveChangesAsync();
+            await _jobGroupsUtility.CreateSingle(jobGroup);
             return RedirectToAction(nameof(Index));
         }
 
-
+     
         public async Task<IActionResult> Edit(JobGroup jobGroup)
         {
             bool exist = await _jobGroupsUtility.JobGroupExists(jobGroup);
