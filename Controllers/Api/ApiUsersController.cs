@@ -16,7 +16,6 @@ namespace JobScheduler.Controllers.Api
     [ApiController]
     public class ApiUsersController : ControllerBase
     {
-        //TODO: completare i metodi affidandosi a UserUtility + pensare se è corretto istanziare UserUtility nel costruttore
         //TODO: ritornare al chiamante di questa api un oggetto che contenga un messaggio di errore se succede qualcosa di strano??
 
         private readonly UserUtility _userUtility;
@@ -26,14 +25,14 @@ namespace JobScheduler.Controllers.Api
             _userUtility = new UserUtility(userManager, context);
         }
 
-        // GET: api/<UsersController>
+
         [HttpGet]
         public IEnumerable<User> Get()
         {
             return _userUtility.GetUsers();
         }
 
-        // GET api/<UsersController>/5
+
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
@@ -42,7 +41,7 @@ namespace JobScheduler.Controllers.Api
             return Ok(user);
         }
 
-        // POST api/<UsersController>
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] UserViewModel userView)
         {
@@ -61,7 +60,7 @@ namespace JobScheduler.Controllers.Api
             return BadRequest(errorResult);
         }
 
-        // PUT api/<UsersController>/5
+
         [HttpPut("{id}")]
         public async Task<IActionResult> Put([FromBody] UserViewModel userView)
         {
@@ -79,7 +78,7 @@ namespace JobScheduler.Controllers.Api
             return Ok(result);
         }
 
-        // DELETE api/<UsersController>/5
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {

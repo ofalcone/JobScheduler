@@ -1,4 +1,4 @@
-﻿@*@model JobScheduler.Models.GroupNode*@
+﻿@model JobScheduler.Models.GroupNode
 
 @{
     ViewData["Title"] = "Create";
@@ -11,13 +11,13 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label class="control-label">Boh</label>
-                <select asp-for=@ViewData["GroupId"] class="form-control" asp-items="ViewBag.GroupId"></select>
+                <label asp-for="GroupId" class="control-label"></label>
+                <select asp-for="GroupId" class="form-control" asp-items="ViewBag.GroupId"></select>
             </div>
-            @*<div class="form-group">
-                    <label asp-for="NodeId" class="control-label"></label>
-                    <select asp-for="NodeId" class ="form-control" asp-items="ViewBag.NodeId"></select>
-                </div>*@
+            <div class="form-group">
+                <label asp-for="NodeId" class="control-label"></label>
+                <select asp-for="NodeId" class="form-control" asp-items="ViewBag.NodeId"></select>
+            </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>

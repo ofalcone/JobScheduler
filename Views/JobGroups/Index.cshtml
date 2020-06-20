@@ -22,19 +22,19 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var jobGroupItem in Model)
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Job.Description)
+                    @Html.DisplayFor(modelItem => jobGroupItem.Job.Description)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Group.Desc)
+                    @Html.DisplayFor(modelItem => jobGroupItem.Group.Desc)
                 </td>
                 <td>
-                    @Html.ActionLink("Edit", "Edit", new { id = item.JobId }) |
-                    @Html.ActionLink("Details", "Details", new { id = item.JobId }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = item.JobId })
+                    @Html.ActionLink("Edit", "Edit", jobGroupItem) |
+                    @Html.ActionLink("Details", "Details", jobGroupItem) |
+                    @Html.ActionLink("Delete", "Delete", jobGroupItem)
                 </td>
             </tr>
         }

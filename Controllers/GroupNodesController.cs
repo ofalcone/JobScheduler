@@ -78,8 +78,8 @@ namespace JobScheduler.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Id", groupNode.GroupId);
-            ViewData["NodeId"] = new SelectList(_context.Nodes, "Id", "Id", groupNode.NodeId);
+            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Desc", groupNode.GroupId);
+            ViewData["NodeId"] = new SelectList(_context.Nodes, "Id", "Desc", groupNode.NodeId);
             return View(groupNode);
         }
 

@@ -16,7 +16,6 @@ namespace JobScheduler.Controllers.Api
     [ApiController]
     public class ApiUserRoleController : ControllerBase
     {
-
         private readonly JobSchedulerContext _context;
         private readonly RolesUtility _roleUtility;
         private readonly UserUtility _userUtility;

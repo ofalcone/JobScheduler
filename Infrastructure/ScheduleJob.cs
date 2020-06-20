@@ -35,11 +35,11 @@ namespace JobScheduler.Infrastructure
             //return base.DoWork(cancellationToken);
 
             //Call web api launch job
-            LaunchJob launchJob = new LaunchJob
-            {
-                Id = id,
-                Path=path
-            };
+            //LaunchJob launchJob = new LaunchJob
+            //{
+            //    Id = id,
+            //    Path=path
+            //};
 
             //TODO: capire come lanciare il job usando dbContextUtility.Launch
             //DbContextUtility dbContextUtility = new DbContextUtility(_context, _configuration);

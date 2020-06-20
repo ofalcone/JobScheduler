@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace JobScheduler.Controllers
 {
-    //TODO: fare i metodi con userManager e userRole qui oppure in dbcontext
     public class UserRoleController : Controller
     {
         private readonly JobSchedulerContext _context;
@@ -32,8 +31,6 @@ namespace JobScheduler.Controllers
 
         public async Task<ActionResult> Index()
         {
-            //var users = _userUtility.GetUsers();
-            //var roles = _roleUtility.GetRoles();
             List<UserRoleViewModel> userRoleViewModels = await _userRoleUtility.GetUserRoles();
             return View(userRoleViewModels.ToArray());
         }
@@ -51,7 +48,6 @@ namespace JobScheduler.Controllers
         }
 
 
-        // GET: UserRoleController/Create
         public IActionResult Create()
         {
             var users = _userUtility.GetUsers();
@@ -107,6 +103,7 @@ namespace JobScheduler.Controllers
             await _userRoleUtility.Update(userId, roleId);
             return RedirectToAction(nameof(Index));
         }
+
 
         public async Task<ActionResult> Delete([Bind("UserId,RoleId")] string userId, string roleId)
         {

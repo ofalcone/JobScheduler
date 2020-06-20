@@ -14,21 +14,16 @@ namespace JobScheduler.Controllers.Api
     [ApiController]
     public class ApiRolesController : ControllerBase
     {
-
-        //TODO: completare i metodi affidandosi a RolesUtility + pensare se è corretto istanziare UserUtility nel costruttore
         //TODO: controllare sempre il ruolo dal token JWT: solo un admin può modificare le tabelle di Roles e Users
-        //private readonly RoleManager<IdentityRole> _roleManager;
-        //private JobSchedulerContext _context;
+
         private readonly RolesUtility _rolesUtility;
 
         public ApiRolesController(RoleManager<IdentityRole> roleManager, JobSchedulerContext context)
         {
-            //_roleManager = roleManager;
-            //_context = context;
             _rolesUtility = new RolesUtility(roleManager, context);
         }
 
-        // GET: api/<RolesController>
+
         [HttpGet]
         public IEnumerable<IdentityRole> Get()
         {
@@ -36,7 +31,7 @@ namespace JobScheduler.Controllers.Api
         }
 
 
-        // GET api/<ApiRolesController>/5
+
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
@@ -45,7 +40,7 @@ namespace JobScheduler.Controllers.Api
             return Ok(role);
         }
 
-        // POST api/<UsersController>
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] IdentityRole role)
         {
@@ -64,7 +59,7 @@ namespace JobScheduler.Controllers.Api
             return BadRequest(errorResult);
         }
 
-        // PUT api/<UsersController>/5
+
         [HttpPut("{id}")]
         public async Task<IActionResult> Put([FromBody] IdentityRole role)
         {
@@ -82,7 +77,7 @@ namespace JobScheduler.Controllers.Api
             return Ok(result);
         }
 
-        // DELETE api/<UsersController>/5
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
