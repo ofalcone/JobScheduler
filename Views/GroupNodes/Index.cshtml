@@ -22,19 +22,19 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var groupNodeItem in Model)
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Group.Desc)
+                    @Html.DisplayFor(modelItem => groupNodeItem.Group.Desc)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Node.Desc)
+                    @Html.DisplayFor(modelItem => groupNodeItem.Node.Desc)
                 </td>
                 <td>
-                    @Html.ActionLink("Edit", "Edit", new { id = item.GroupId }) |
-                    @Html.ActionLink("Details", "Details", new { id = item.GroupId }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = item.GroupId })
+                    @Html.ActionLink("Edit", "Edit", groupNodeItem) |
+                    @Html.ActionLink("Details", "Details", groupNodeItem) |
+                    @Html.ActionLink("Delete", "Delete", groupNodeItem)
                 </td>
             </tr>
         }

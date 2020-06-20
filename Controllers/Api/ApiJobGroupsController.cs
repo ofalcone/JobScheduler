@@ -59,9 +59,9 @@ namespace JobScheduler.Controllers.Api
 
 
         [HttpDelete]
-        public async Task Delete(int jobId, int groupId)
+        public async Task Delete(JobGroup jobGroup)
         {
-            await _jobGroupsUtility.Delete(jobId, groupId);
+            await _jobGroupsUtility.Delete(jobGroup);
         }
     }
 }

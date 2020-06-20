@@ -36,16 +36,15 @@ namespace JobScheduler.Controllers
         public async Task<IActionResult> Details(JobGroup jobGroup)
         {
             //TODO gestire errori
-            var jobGroupFound = await _jobGroupsUtility.GetSingle(jobGroup);
+            //var jobGroupFound = await _jobGroupsUtility.JobGroupExists(jobGroup);
 
-            jobGroupFound.Group = await _context.Groups.FindAsync(jobGroup.GroupId);
-            jobGroupFound.Job = await _context.Jobs.FindAsync(jobGroup.JobId);
+            jobGroup.Group = await _context.Groups.FindAsync(jobGroup.GroupId);
+            jobGroup.Job = await _context.Jobs.FindAsync(jobGroup.JobId);
 
             return View(jobGroup);
         }
 
      
-
         public IActionResult Create()
         {
             ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Desc");
@@ -80,8 +79,8 @@ namespace JobScheduler.Controllers
                 OldGroupId = jobGroup.GroupId
             };
 
-            ViewData["JobId"] = new SelectList(_context.Jobs, "Id", "Description", jobGroup.JobId);
-            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Desc", jobGroup.GroupId);
+            ViewData["JobId"] = new SelectList(_context.Jobs, nameof(Job.Id), nameof(Job.Description), jobGroup.JobId);
+            ViewData["GroupId"] = new SelectList(_context.Groups, nameof(Group.Id), nameof(Group.Desc), jobGroup.GroupId);
 
             return View(jobGroupViewModel);
         }
@@ -89,7 +88,7 @@ namespace JobScheduler.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([Bind("OldJobId,OldGroupId,NewJobId,NewGroupId")]JobGroupViewModel jobGroupViewModel)
+        public async Task<IActionResult> Edit(JobGroupViewModel jobGroupViewModel)
         {
             try
             {
@@ -122,11 +121,11 @@ namespace JobScheduler.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed([Bind("JobId,GroupId")]int jobId, int groupId)
+        public async Task<IActionResult> DeleteConfirmed([Bind("JobId,GroupId")]JobGroup jobGroup)
         {
             try
             {
-                await _jobGroupsUtility.Delete(jobId, groupId);
+                await _jobGroupsUtility.Delete(jobGroup);
             }
             catch
             {

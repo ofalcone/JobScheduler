@@ -38,13 +38,13 @@ namespace JobScheduler.Infrastructure
             //jobGroup.Group = await _context.Groups.FindAsync(jobGroup.GroupId);
             //jobGroup.Job = await _context.Jobs.FindAsync(jobGroup.JobId);
 
-            return await _context.JobGroupes.FindAsync(jobGroup);
+            return await _context.JobGroupes.FindAsync(jobGroup.JobId,jobGroup.GroupId);
         }
 
 
         internal async Task CreateSingle(JobGroup jobGroup)
         {
-            _context.JobGroupes.Add(jobGroup);
+            await _context.JobGroupes.AddAsync(jobGroup);
             await _context.SaveChangesAsync();
         }
 
@@ -64,26 +64,26 @@ namespace JobScheduler.Infrastructure
             };
 
             _context.JobGroupes.Remove(oldJobGroup);
+            await _context.SaveChangesAsync();
 
-            var jobGroup = new JobGroup
+            var newJobGroup = new JobGroup
             {
                 JobId = jobGroupViewModel.NewJobId,
                 GroupId = jobGroupViewModel.NewGroupId
             };
 
-            _context.JobGroupes.Add(jobGroup);
+            bool alreadyExist = await JobGroupExists(newJobGroup);
+            if (alreadyExist)
+            {
+                return;
+            }
+
+            _context.JobGroupes.Add(newJobGroup);
             await _context.SaveChangesAsync();
         }
 
-        internal async Task Delete(int oldJobId, int oldGroupId)
+        internal async Task Delete(JobGroup jobGroup)
         {
-            var jobGroup = new JobGroup
-            {
-                JobId = oldJobId,
-                GroupId = oldGroupId
-            };
-
-
             _context.JobGroupes.Remove(jobGroup);
             await _context.SaveChangesAsync();
         }

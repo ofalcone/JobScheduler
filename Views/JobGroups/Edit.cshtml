@@ -12,11 +12,14 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <select asp-for="OldJobId" class="form-control" asp-items="ViewBag.JobId"></select>
-            <select asp-for="OldGroupId" class="form-control" asp-items="ViewBag.GroupId"></select>
 
+            <select asp-for="NewJobId" class="form-control" asp-items="ViewBag.JobId"></select>
             <input type="hidden" asp-for="NewJobId" />
+
+            <select asp-for="NewGroupId" class="form-control" asp-items="ViewBag.GroupId"></select>
             <input type="hidden" asp-for="NewGroupId" />
+
+
             <input type="hidden" asp-for="OldJobId" />
             <input type="hidden" asp-for="OldGroupId" />
             <div class="form-group">

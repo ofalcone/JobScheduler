@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using JobScheduler.Data;
 using JobScheduler.Models;
 using Microsoft.AspNetCore.Authorization;
+using JobScheduler.Infrastructure;
+using JobScheduler.ViewModels;
 
 namespace JobScheduler.Controllers
 {
@@ -15,40 +17,36 @@ namespace JobScheduler.Controllers
     public class GroupNodesController : Controller
     {
         private readonly JobSchedulerContext _context;
+        private readonly GroupNodesUtility _groupsNodesUtility;
 
         public GroupNodesController(JobSchedulerContext context)
         {
             _context = context;
+            _groupsNodesUtility = new GroupNodesUtility(context);
         }
 
-        // GET: GroupNodes
+
         public async Task<IActionResult> Index()
         {
-            var jobSchedulerContext = _context.GroupNodes.Include(g => g.Group).Include(g => g.Node);
-            return View(await jobSchedulerContext.ToListAsync());
+            return View(await _groupsNodesUtility.GetAll());
         }
 
-        // GET: GroupNodes/Details/5
-        public async Task<IActionResult> Details(int? id)
+
+        public async Task<IActionResult> Details(GroupNode groupNode)
         {
-            if (id == null)
+            bool groupNodeExist = await _groupsNodesUtility.GroupNodeExists(groupNode);
+            if (!groupNodeExist)
             {
                 return NotFound();
             }
 
-            var groupNode = await _context.GroupNodes
-                .Include(g => g.Group)
-                .Include(g => g.Node)
-                .FirstOrDefaultAsync(m => m.GroupId == id);
-            if (groupNode == null)
-            {
-                return NotFound();
-            }
+            groupNode.Group = await _context.Groups.FindAsync(groupNode.GroupId);
+            groupNode.Node = await _context.Nodes.FindAsync(groupNode.NodeId);
 
             return View(groupNode);
         }
 
-        // GET: GroupNodes/Create
+
         public IActionResult Create()
         {
             var n = _context.Nodes;
@@ -59,111 +57,81 @@ namespace JobScheduler.Controllers
             return View();
         }
 
-        // POST: GroupNodes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("GroupId,NodeId")] GroupNode groupNode)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(groupNode);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Desc", groupNode.GroupId);
-            ViewData["NodeId"] = new SelectList(_context.Nodes, "Id", "Desc", groupNode.NodeId);
-            return View(groupNode);
+            await _groupsNodesUtility.CreateSingle(groupNode);
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: GroupNodes/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+
+        public async Task<IActionResult> Edit(GroupNode groupNode)
         {
-            if (id == null)
+            bool exist = await _groupsNodesUtility.GroupNodeExists(groupNode);
+
+            if (!exist)
             {
                 return NotFound();
             }
 
-            var groupNode = await _context.GroupNodes
-               .Include(j => j.Group)
-               .Include(j => j.Node)
-               .FirstOrDefaultAsync(m => m.GroupId == id);
-
-            if (groupNode == null)
+            GroupNodeViewModel groupNodeViewModel = new GroupNodeViewModel
             {
-                return NotFound();
-            }
-            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Desc", groupNode.GroupId);
-            ViewData["NodeId"] = new SelectList(_context.Nodes, "Id", "Desc", groupNode.NodeId);
-            return View(groupNode);
+                OldNodeId = groupNode.NodeId,
+                OldGroupId = groupNode.GroupId
+            };
+
+            ViewData["GroupId"] = new SelectList(_context.Groups, nameof(Group.Id), nameof(Group.Desc), groupNode.GroupId);
+            ViewData["NodeId"] = new SelectList(_context.Nodes, nameof(Node.Id), nameof(Node.Desc), groupNode.NodeId);
+            
+            return View(groupNodeViewModel);
         }
 
-        // POST: GroupNodes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("GroupId,NodeId")] GroupNode groupNode)
+        public async Task<IActionResult> Edit(GroupNodeViewModel groupNodeViewModel)
         {
-            if (id != groupNode.GroupId)
+            try
+            {
+                await _groupsNodesUtility.Update(groupNodeViewModel);
+            }
+            catch
+            {
+                return NotFound();
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+
+        public async Task<IActionResult> Delete(GroupNode groupNode)
+        {
+            bool exist = await _groupsNodesUtility.GroupNodeExists(groupNode);
+
+            if (!exist)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(groupNode);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!GroupNodeExists(groupNode.GroupId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Desc", groupNode.GroupId);
-            ViewData["NodeId"] = new SelectList(_context.Nodes, "Id", "Desc", groupNode.NodeId);
+            groupNode.Group = await _context.Groups.FindAsync(groupNode.GroupId);
+            groupNode.Node = await _context.Nodes.FindAsync(groupNode.NodeId);
             return View(groupNode);
         }
 
-        // GET: GroupNodes/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var groupNode = await _context.GroupNodes
-                .Include(g => g.Group)
-                .Include(g => g.Node)
-                .FirstOrDefaultAsync(m => m.GroupId == id);
-            if (groupNode == null)
-            {
-                return NotFound();
-            }
-
-            return View(groupNode);
-        }
-
-        // POST: GroupNodes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed([Bind("NodeId,GroupId")]GroupNode groupNode)
         {
-            var groupNode = await _context.GroupNodes.FindAsync(id);
-            _context.GroupNodes.Remove(groupNode);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _groupsNodesUtility.Delete(groupNode);
+            }
+            catch
+            {
+                return NotFound();
+            }
             return RedirectToAction(nameof(Index));
         }
 
