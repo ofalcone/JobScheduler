@@ -69,14 +69,14 @@ namespace JobScheduler.Data
                     using (var response = await httpClient.PostAsync($"{slaveURl}", content))
                     {
                         string apiResponse = await response.Content.ReadAsStringAsync();
-                        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<object>(apiResponse);
-                        if (result is List<JobResult>)
+                        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<List<JobResult>>(apiResponse);
+
+                        if (result == null)
                         {
-                            return (List<JobResult>)result;
+                            return null;
                         }
 
-                        return null;
-                        
+                        //scrivere su db le info ritornate dallo slave
                     }
                 }
             }
