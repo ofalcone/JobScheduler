@@ -35,23 +35,31 @@ namespace JobScheduler.Data
 
             };
 
-            //var list = await _context.Jobs.Include(job => job.JobGroupes)
-            //    .ThenInclude(jobGroupes => jobGroupes.Group)
-            //    .Where(job => job.Id == launchJob.Id)
-            //    .ToListAsync();
+            var listGroupes = await _context.JobGroupes
+                .Include(jg => jg.Group)
+                .Where(jg => jg.JobId == launchJob.Id)
+                .Select(jg => jg.Group)
+                .ToListAsync();
 
-            var listGroupes = from job in _context.Jobs
-                              from gr in _context.Groups
-                              where job.Id == launchJob.Id
-                              select gr;
-
-            foreach (var item in listGroupes)
+            if (listGroupes == null || listGroupes.Count<1)
             {
-                var listNodes = from gr in _context.Groups
-                                from nodes in _context.Nodes
-                                where gr.Id == item.Id
-                                select nodes.Id;
-                test.IdNodeList = listNodes.ToList<int>();
+                return null;
+            }
+
+            foreach (var group in listGroupes)
+            {
+                var listNodes = await _context.GroupNodes
+                    .Include(gn => gn.Node)
+                .Where(gn => gn.GroupId == group.Id)
+                .Select(gn => gn.Node)
+                .ToListAsync();
+
+                test.IdNodeList = listNodes.Select(node => node.Id).ToList();
+            }
+
+            if (test.IdNodeList != null && test.IdNodeList.Count<1)
+            {
+                return null;
             }
             try
             {
@@ -62,7 +70,13 @@ namespace JobScheduler.Data
                     {
                         string apiResponse = await response.Content.ReadAsStringAsync();
                         var result = Newtonsoft.Json.JsonConvert.DeserializeObject<object>(apiResponse);
-                        return result;
+                        if (result is List<JobResult>)
+                        {
+                            return (List<JobResult>)result;
+                        }
+
+                        return null;
+                        
                     }
                 }
             }
