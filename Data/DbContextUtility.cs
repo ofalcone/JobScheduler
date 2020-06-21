@@ -16,7 +16,7 @@ namespace JobScheduler.Data
     public class DbContextUtility
     {
         private readonly JobSchedulerContext _context;
-        private readonly IConfiguration _configuration;
+        private static readonly IConfiguration _configuration;
 
         public DbContextUtility(JobSchedulerContext context, IConfiguration configuration)
         {
@@ -26,7 +26,6 @@ namespace JobScheduler.Data
 
         public async Task<object> Launch(LaunchJob launchJob)
         {
-            string slaveURl = string.Format(_configuration["SlaveUrls:Slave1-Launch"]);
             SlaveJobModel test = new SlaveJobModel
             {
                 Id = launchJob.Id,
@@ -51,9 +50,9 @@ namespace JobScheduler.Data
                 {
                     var listNodes = await _context.GroupNodes
                         .Include(gn => gn.Node)
-                    .Where(gn => gn.GroupId == group.Id)
-                    .Select(gn => gn.Node)
-                    .ToListAsync();
+                        .Where(gn => gn.GroupId == group.Id)
+                        .Select(gn => gn.Node)
+                        .ToListAsync();
 
                     if (listNodes == null || listNodes.Count < 1)
                     {
@@ -67,19 +66,27 @@ namespace JobScheduler.Data
                     test.IdNodeList = listNodes.Select(node => node.Id).ToList();
                 }
             }
-            
+
             return default;
         }
 
 
-        private static async Task ExecuteLaunch(string slaveURl, SlaveJobModel test)
+        private static async Task ExecuteLaunch(string slaveIp, SlaveJobModel slaveJobModel)
         {
+            string launchAction = _configuration["SlaveUrls:SlaveLaunch"];
+            string slaveUrl = slaveIp + launchAction;
+
+            if (string.IsNullOrWhiteSpace(slaveUrl) || slaveJobModel == null)
+            {
+                return;
+            }
+
             try
             {
                 using (var httpClient = new HttpClient())
                 {
-                    StringContent content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(test), Encoding.UTF8, "application/json");
-                    using (var response = await httpClient.PostAsync($"{slaveURl}", content))
+                    StringContent content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(slaveJobModel), Encoding.UTF8, "application/json");
+                    using (var response = await httpClient.PostAsync($"{slaveUrl}", content))
                     {
                         string apiResponse = await response.Content.ReadAsStringAsync();
                         var result = Newtonsoft.Json.JsonConvert.DeserializeObject<List<JobResult>>(apiResponse);
@@ -101,14 +108,14 @@ namespace JobScheduler.Data
 
         public async Task<IActionResult> Stop(StopJob stopJob)
         {
-            string slaveURl = string.Format(_configuration["SlaveUrls:Slave1-Stop"]);
-
+            string launchAction = _configuration["SlaveUrls:SlaveLaunch"];
+            string slaveUrl = slaveIp + launchAction;
             try
             {
                 using (var httpClient = new HttpClient())
                 {
                     StringContent content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(stopJob), Encoding.UTF8, "application/json");
-                    using (var response = await httpClient.PostAsync($"{slaveURl}", content))
+                    using (var response = await httpClient.PostAsync($"{slaveUrl}", content))
                     {
                         string apiResponse = await response.Content.ReadAsStringAsync();
                         var result = Newtonsoft.Json.JsonConvert.DeserializeObject<IActionResult>(apiResponse);

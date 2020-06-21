@@ -4,14 +4,16 @@ using JobScheduler.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace JobScheduler.Migrations
 {
     [DbContext(typeof(JobSchedulerContext))]
-    partial class JobSchedulerContextModelSnapshot : ModelSnapshot
+    [Migration("20200621191817_job_add_argomenti")]
+    partial class job_add_argomenti
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
