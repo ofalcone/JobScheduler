@@ -57,7 +57,7 @@ namespace JobScheduler.Data
                 test.IdNodeList = listNodes.Select(node => node.Id).ToList();
             }
 
-            if (test.IdNodeList != null && test.IdNodeList.Count<1)
+            if (test.IdNodeList == null || test.IdNodeList.Count<1)
             {
                 return null;
             }

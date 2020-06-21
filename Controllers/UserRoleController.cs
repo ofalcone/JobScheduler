@@ -6,6 +6,7 @@ using JobScheduler.Data;
 using JobScheduler.Infrastructure;
 using JobScheduler.Models;
 using JobScheduler.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace JobScheduler.Controllers
 {
+    [Authorize(Roles = RolesNames.Admin)]
     public class UserRoleController : Controller
     {
         private readonly JobSchedulerContext _context;

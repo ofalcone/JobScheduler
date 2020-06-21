@@ -6,6 +6,7 @@ using JobScheduler.Data;
 using JobScheduler.Infrastructure;
 using JobScheduler.Models;
 using JobScheduler.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,7 @@ namespace JobScheduler.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = RolesNames.Admin)]
     public class ApiUserRoleController : ControllerBase
     {
         private readonly JobSchedulerContext _context;

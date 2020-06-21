@@ -90,10 +90,9 @@ namespace JobScheduler.Controllers
                             Subject = new ClaimsIdentity(new Claim[]
                             {
                                 new Claim(ClaimTypes.Name, user.Id.ToString()),
-                                //cambiare in ricerca del role dell'utente e togliere "Admin"
-                                new Claim(ClaimTypes.Role, "Admin")
+                                new Claim(ClaimTypes.Role, RolesNames.Admin)
                             }),
-                            //se voglio i token che non scadono, possono mettere un valore molto lungo
+                            //se voglio che i token non scadano, possono mettere un valore molto alto
                             Expires = DateTime.UtcNow.AddDays(7),
                             //algoritmo di cifratura
                             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

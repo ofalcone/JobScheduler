@@ -10,10 +10,11 @@ using JobScheduler.Models;
 using JobScheduler.Abstract;
 using JobScheduler.ViewModels;
 using JobScheduler.Infrastructure;
+using Microsoft.AspNetCore.Authorization;
 
 namespace JobScheduler.Controllers
 {
-    //public class JobGroupsController : MvcNmCrudController<JobSchedulerContext, JobGroup>
+    [Authorize(Roles = RolesNames.Admin)]
     public class JobGroupsController : Controller
     {
         private readonly JobSchedulerContext _context;

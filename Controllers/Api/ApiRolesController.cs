@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using JobScheduler.Data;
 using JobScheduler.Infrastructure;
 using JobScheduler.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,6 +13,7 @@ namespace JobScheduler.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = RolesNames.Admin)]
     public class ApiRolesController : ControllerBase
     {
         //TODO: controllare sempre il ruolo dal token JWT: solo un admin può modificare le tabelle di Roles e Users

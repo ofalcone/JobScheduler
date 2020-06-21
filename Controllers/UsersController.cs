@@ -13,9 +13,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace JobScheduler.Controllers
 {
-    //TODO: fare la struttura delle action (Edit,Delete) esattamente come in MvcCrudController (Edit richiama la View, l'edit effettiva viene fatta dopo aver confermato; idem per Delete)
-    //TODO: controllare cosa un admin può modificare, servono altri campi??
-    //[Authorize]
+    [Authorize(Roles = RolesNames.Admin)]
     public class UsersController : Controller
     {
         private readonly UserManager<User> _userManager;

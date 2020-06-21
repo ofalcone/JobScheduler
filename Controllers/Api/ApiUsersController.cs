@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using JobScheduler.Data;
 using JobScheduler.Infrastructure;
 using JobScheduler.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,6 +15,7 @@ namespace JobScheduler.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = RolesNames.Admin)]
     public class ApiUsersController : ControllerBase
     {
         //TODO: ritornare al chiamante di questa api un oggetto che contenga un messaggio di errore se succede qualcosa di strano??

@@ -13,7 +13,7 @@ using JobScheduler.ViewModels;
 
 namespace JobScheduler.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = RolesNames.Admin)]
     public class GroupNodesController : Controller
     {
         private readonly JobSchedulerContext _context;
