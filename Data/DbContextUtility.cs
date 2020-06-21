@@ -1,5 +1,6 @@
 ﻿using JobScheduler.Infrastructure;
 using JobScheduler.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -7,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net.Http;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -41,26 +41,36 @@ namespace JobScheduler.Data
                 .Select(jg => jg.Group)
                 .ToListAsync();
 
-            if (listGroupes == null || listGroupes.Count<1)
+            if (listGroupes == null || listGroupes.Count < 1)
+            {
+                //Esecuzione su tutti i nodi esistenti
+                test.IdNodeList = _context.Nodes.Select(node => node.Id).ToList();
+            }
+            else
+            {
+                foreach (var group in listGroupes)
+                {
+                    var listNodes = await _context.GroupNodes
+                        .Include(gn => gn.Node)
+                    .Where(gn => gn.GroupId == group.Id)
+                    .Select(gn => gn.Node)
+                    .ToListAsync();
+
+                    test.IdNodeList = listNodes.Select(node => node.Id).ToList();
+                }
+            }
+
+            if (test.IdNodeList == null || test.IdNodeList.Count < 1)
             {
                 return null;
             }
 
-            foreach (var group in listGroupes)
-            {
-                var listNodes = await _context.GroupNodes
-                    .Include(gn => gn.Node)
-                .Where(gn => gn.GroupId == group.Id)
-                .Select(gn => gn.Node)
-                .ToListAsync();
+            await ExecuteLaunch(slaveURl, test);
+            return default;
+        }
 
-                test.IdNodeList = listNodes.Select(node => node.Id).ToList();
-            }
-
-            if (test.IdNodeList == null || test.IdNodeList.Count<1)
-            {
-                return null;
-            }
+        private static async Task ExecuteLaunch(string slaveURl, SlaveJobModel test)
+        {
             try
             {
                 using (var httpClient = new HttpClient())
@@ -71,11 +81,7 @@ namespace JobScheduler.Data
                         string apiResponse = await response.Content.ReadAsStringAsync();
                         var result = Newtonsoft.Json.JsonConvert.DeserializeObject<List<JobResult>>(apiResponse);
 
-                        if (result == null)
-                        {
-                            return null;
-                        }
-
+                        //return result;
                         //scrivere su db le info ritornate dallo slave
                     }
                 }
@@ -83,10 +89,9 @@ namespace JobScheduler.Data
             catch
             {
             }
-            return default;
         }
 
-        public async Task<object> Stop(StopJob stopJob)
+        public async Task<IActionResult> Stop(StopJob stopJob)
         {
             string slaveURl = string.Format(_configuration["SlaveUrls:Slave1-Stop"]);
 
@@ -98,7 +103,7 @@ namespace JobScheduler.Data
                     using (var response = await httpClient.PostAsync($"{slaveURl}", content))
                     {
                         string apiResponse = await response.Content.ReadAsStringAsync();
-                        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<object>(apiResponse);
+                        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<IActionResult>(apiResponse);
                         return result;
                     }
                 }

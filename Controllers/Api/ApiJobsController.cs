@@ -37,7 +37,7 @@ namespace JobScheduler.Controllers.Api
         }
 
         [HttpPost]
-        public async Task<object> Stop(StopJob stopJob)
+        public async Task<IActionResult> Stop(StopJob stopJob)
         {
             DbContextUtility dbContextUtility = new DbContextUtility(_context, _configuration);
             return await dbContextUtility.Stop(stopJob);

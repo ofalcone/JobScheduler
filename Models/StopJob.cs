@@ -7,7 +7,7 @@ namespace JobScheduler.Models
 {
     public class StopJob
     {
-        public int Id { get; set; }
+        public int JobId { get; set; }
         public int Pid { get; set; }
     }
 }

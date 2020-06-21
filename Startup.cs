@@ -38,10 +38,6 @@ namespace JobScheduler
             services.AddDbContext<JobSchedulerContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("Default")));
 
-            //services.AddScoped<DbContextUtility>();
-            //services.AddScoped<UserUtility>();
-
-
             //Ogni utente può avere N ruoli, il ruolo è una stringa
             //config server per impostare dei parametri di autenticazione
             services.AddIdentity<User, IdentityRole>(config =>
@@ -85,8 +81,7 @@ namespace JobScheduler
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
-            //Middleware aspnetcore.Identity.EntityFramework che filtra le richieste in base all'autenticazione
-            //Va messo prima di UseRouting e UseAuthorization
+            //Middleware aspnetcore.Identity.EntityFramework che filtra le richieste in base all'autenticazione: va messo prima di UseRouting e UseAuthorization
             app.UseAuthentication();
             app.UseRouting();
 

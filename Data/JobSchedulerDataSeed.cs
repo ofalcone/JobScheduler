@@ -65,7 +65,7 @@ namespace JobScheduler.Data
 
         private async Task<IdentityRole> CreateAdminRole()
         {
-            const string tipoRuolo = "Admin";
+            const string tipoRuolo = Constants.ADMIN_ROLE;
 
             var foundRole = await _roleManager.FindByNameAsync(tipoRuolo);
 

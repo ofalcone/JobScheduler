@@ -26,20 +26,17 @@ namespace JobScheduler.Controllers
         }
 
 
-        //TODO: definire oggetto di ritorno
+        //Scrivere da qualche parte le info di ritorno
         public async Task<object> Launch(LaunchJob launchJob)
         {
             DbContextUtility dbContextUtility = new DbContextUtility(_context,_configuration);
             return await dbContextUtility.Launch(launchJob);
         }
 
-        //TODO: definire oggetto di ritorno
-        public async Task<object> Stop(int jobId)
+        //Dove prendo il pid da killare? ho il job id ma manca il groupId dove è stato eseguito
+        public async Task<object> Stop(StopJob stopJob)
         {
             DbContextUtility dbContextUtility = new DbContextUtility(_context, _configuration);
-            StopJob stopJob = null;
-            //TODO: fare un metodo che prende il PID del programma da arrestare (ritornato dalla Launch) dato l'id del job (Dove lo mettiamo il PID?)
-            //stopJob = dbContextUtility.GetStopJobById(jobId);
             return await dbContextUtility.Stop(stopJob);
         }
     }
