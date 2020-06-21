@@ -14,7 +14,7 @@ namespace JobScheduler.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = RolesNames.Admin)]
+    [Authorize(Roles = Constants.ADMIN_ROLE)]
     public class ApiGroupNodesController : ControllerBase
     {
 

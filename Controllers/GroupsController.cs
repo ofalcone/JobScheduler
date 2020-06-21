@@ -13,7 +13,7 @@ using JobScheduler.Abstract;
 
 namespace JobScheduler.Controllers
 {
-    [Authorize(Roles = RolesNames.Admin)]
+    [Authorize(Roles = Constants.ADMIN_ROLE)]
     public class GroupsController : MvcCrudController<JobSchedulerContext, Group>
     {
         //private readonly JobSchedulerContext _context;

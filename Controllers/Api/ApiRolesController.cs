@@ -13,7 +13,7 @@ namespace JobScheduler.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = RolesNames.Admin)]
+    [Authorize(Roles = Constants.ADMIN_ROLE)]
     public class ApiRolesController : ControllerBase
     {
         //TODO: controllare sempre il ruolo dal token JWT: solo un admin può modificare le tabelle di Roles e Users

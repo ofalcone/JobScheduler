@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JobScheduler.Controllers
 {
-    [Authorize(Roles = RolesNames.Admin)]
+    [Authorize(Roles = Constants.ADMIN_ROLE)]
     public class RoleController : Controller
     {
         private readonly RolesUtility _roleUtility;

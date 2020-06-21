@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace JobScheduler.Controllers
 {
-    [Authorize(Roles = RolesNames.Admin)]
+    [Authorize(Roles = Constants.ADMIN_ROLE)]
     public class JobGroupsController : Controller
     {
         private readonly JobSchedulerContext _context;

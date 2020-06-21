@@ -90,7 +90,7 @@ namespace JobScheduler.Controllers
                             Subject = new ClaimsIdentity(new Claim[]
                             {
                                 new Claim(ClaimTypes.Name, user.Id.ToString()),
-                                new Claim(ClaimTypes.Role, RolesNames.Admin)
+                                new Claim(ClaimTypes.Role, Constants.ADMIN_ROLE)
                             }),
                             //se voglio che i token non scadano, possono mettere un valore molto alto
                             Expires = DateTime.UtcNow.AddDays(7),

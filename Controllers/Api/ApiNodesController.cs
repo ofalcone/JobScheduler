@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using JobScheduler.Abstract;
 using JobScheduler.Data;
+using JobScheduler.Infrastructure;
 using JobScheduler.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,7 +15,7 @@ namespace JobScheduler.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = RolesNames.Admin)]
+    [Authorize(Roles = Constants.ADMIN_ROLE)]
     public class ApiNodesController : CrudController<JobSchedulerContext,Node >
     {
         public ApiNodesController(JobSchedulerContext context) : base(context)
