@@ -32,7 +32,6 @@ namespace JobScheduler.Data
                 Id = launchJob.Id,
                 Path = launchJob.Path,
                 Argument = ""
-
             };
 
             var listGroupes = await _context.JobGroupes
@@ -81,6 +80,10 @@ namespace JobScheduler.Data
                         string apiResponse = await response.Content.ReadAsStringAsync();
                         var result = Newtonsoft.Json.JsonConvert.DeserializeObject<List<JobResult>>(apiResponse);
 
+                        if (result != null && result.Count > 0)
+                        {
+
+                        }
                         //return result;
                         //scrivere su db le info ritornate dallo slave
                     }
