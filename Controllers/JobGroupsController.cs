@@ -36,9 +36,6 @@ namespace JobScheduler.Controllers
 
         public async Task<IActionResult> Details(JobGroup jobGroup)
         {
-            //TODO gestire errori
-            //var jobGroupFound = await _jobGroupsUtility.JobGroupExists(jobGroup);
-
             jobGroup.Group = await _context.Groups.FindAsync(jobGroup.GroupId);
             jobGroup.Job = await _context.Jobs.FindAsync(jobGroup.JobId);
 
@@ -58,8 +55,6 @@ namespace JobScheduler.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("JobId,GroupId")] JobGroup jobGroup)
         {
-            //TODO: gestione errori
-
             await _jobGroupsUtility.CreateSingle(jobGroup);
             return RedirectToAction(nameof(Index));
         }

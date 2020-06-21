@@ -16,8 +16,6 @@ namespace JobScheduler.Controllers.Api
     [Authorize(Roles = Constants.ADMIN_ROLE)]
     public class ApiRolesController : ControllerBase
     {
-        //TODO: controllare sempre il ruolo dal token JWT: solo un admin può modificare le tabelle di Roles e Users
-
         private readonly RolesUtility _rolesUtility;
 
         public ApiRolesController(RoleManager<IdentityRole> roleManager, JobSchedulerContext context)

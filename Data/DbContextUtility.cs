@@ -55,18 +55,22 @@ namespace JobScheduler.Data
                     .Select(gn => gn.Node)
                     .ToListAsync();
 
+                    if (listNodes == null || listNodes.Count < 1)
+                    {
+                        continue;
+                    }
+
+                    foreach (var node in listNodes)
+                    {
+                        await ExecuteLaunch(node.IndirizzoIP, test);
+                    }
                     test.IdNodeList = listNodes.Select(node => node.Id).ToList();
                 }
             }
-
-            if (test.IdNodeList == null || test.IdNodeList.Count < 1)
-            {
-                return null;
-            }
-
-            await ExecuteLaunch(slaveURl, test);
+            
             return default;
         }
+
 
         private static async Task ExecuteLaunch(string slaveURl, SlaveJobModel test)
         {
@@ -93,6 +97,7 @@ namespace JobScheduler.Data
             {
             }
         }
+
 
         public async Task<IActionResult> Stop(StopJob stopJob)
         {

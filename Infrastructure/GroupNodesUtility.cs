@@ -55,7 +55,6 @@ namespace JobScheduler.Infrastructure
 
         internal async Task Update(GroupNodeViewModel groupNodeViewModel)
         {
-            //TODO: far ritornare un result con info di success o failure
             var oldJobGroup = new GroupNode
             {
                 NodeId = groupNodeViewModel.OldNodeId,

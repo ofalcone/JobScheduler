@@ -38,7 +38,6 @@ namespace JobScheduler.Controllers.Api
         [HttpGet]
         public async Task<GroupNode> Get(GroupNode jobGroup)
         {
-            //TODO: questa get probabilmente non ha senso...
             return await _groupNodesUtility.GetSingle(jobGroup);
         }
 

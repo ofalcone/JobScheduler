@@ -10,7 +10,7 @@ namespace JobScheduler.Models
         public int Id { get; set; }
         public string Tipo { get; set; }
         public string Desc { get; set; }
-        public string IndirizzoIp { get; set; }
+        public string IndirizzoIP { get; set; }
 
         public ICollection<GroupNode> GroupNodes { get; set; }
     }

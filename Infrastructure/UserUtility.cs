@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace JobScheduler.Infrastructure
 {
-    //TODO: scegliere come gestire gli errori, o come nella Create (errore gestito localmente) oppure nella Update (errore gestito dal chiamante)
     public class UserUtility
     {
         private readonly UserManager<User> _userManager;

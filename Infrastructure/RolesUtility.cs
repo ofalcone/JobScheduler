@@ -41,7 +41,6 @@ namespace JobScheduler.Infrastructure
                 return errorString;
             }
 
-            //TODO: controllare se _roleManager.CreateAsync fa già la commit (probabilmente sì)
             await UtilityDatabase.TryCommit<IdentityRole>(_context, newUser);
 
             return errorString;

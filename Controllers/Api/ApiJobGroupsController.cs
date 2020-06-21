@@ -17,9 +17,6 @@ namespace JobScheduler.Controllers.Api
     [Authorize(Roles = Constants.ADMIN_ROLE)]
     public class ApiJobGroupsController : ControllerBase
     {
-
-        //TODO gestire errori
-
         private readonly JobSchedulerContext _context;
         private readonly JobGroupsUtility _jobGroupsUtility;
 
@@ -40,7 +37,6 @@ namespace JobScheduler.Controllers.Api
         [HttpGet]
         public async Task<JobGroup> Get(JobGroup jobGroup)
         {
-            //TODO: questa get probabilmente non ha senso...
             return await _jobGroupsUtility.GetSingle(jobGroup);
         }
 

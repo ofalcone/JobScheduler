@@ -18,8 +18,6 @@ namespace JobScheduler.Controllers.Api
     [Authorize(Roles = Constants.ADMIN_ROLE)]
     public class ApiUsersController : ControllerBase
     {
-        //TODO: ritornare al chiamante di questa api un oggetto che contenga un messaggio di errore se succede qualcosa di strano??
-
         private readonly UserUtility _userUtility;
 
         public ApiUsersController(UserManager<User> userManager, JobSchedulerContext context)

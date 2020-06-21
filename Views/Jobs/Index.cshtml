@@ -24,6 +24,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.Orario)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Argomenti)
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -44,13 +47,14 @@
                 @Html.DisplayFor(modelItem => item.Orario)
             </td>
             <td>
+                @Html.DisplayFor(modelItem => item.Argomenti)
+            </td>
+            <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
-                @Html.ActionLink("Launch", "Launch", "Jobs", new { Id = item.Id, Orario = item.Orario, Path = item.Path }, null) |
-                @* TODO: Mostrare lo stop solo se Job is running *@
+                @Html.ActionLink("Launch", "Launch", "Jobs", new { Id = item.Id, Orario = item.Orario, Path = item.Path, Argomenti= item.Argomenti }, null) |
                 @Html.ActionLink("Stop", "Stop", "Jobs", new { Id = item.Id }, null)
-                @*<a asp-action="Launch" asp-all-route-data="" @Html.Action("Update me!", "Update",new {Id=item.Id,Orario=item.Orario})>Launch</a>*@
             </td>
         </tr>
         }

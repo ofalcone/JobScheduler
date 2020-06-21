@@ -12,6 +12,7 @@ namespace JobScheduler.Models
         public string Path { get; set; }
         public string Orario { get; set; }
         public string Description { get; set; }
+        public string Argomenti { get; set; }
         public ICollection<JobGroup> JobGroupes { get; set; }
 
     }
