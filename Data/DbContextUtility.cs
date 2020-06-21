@@ -16,7 +16,7 @@ namespace JobScheduler.Data
     public class DbContextUtility
     {
         private readonly JobSchedulerContext _context;
-        private static readonly IConfiguration _configuration;
+        private static IConfiguration _configuration;
 
         public DbContextUtility(JobSchedulerContext context, IConfiguration configuration)
         {
@@ -26,11 +26,11 @@ namespace JobScheduler.Data
 
         public async Task<object> Launch(LaunchJob launchJob)
         {
-            SlaveJobModel test = new SlaveJobModel
+            SlaveJobModel slaveJobModel = new SlaveJobModel
             {
                 Id = launchJob.Id,
                 Path = launchJob.Path,
-                Argument = ""
+                Argomenti = launchJob.Argomenti
             };
 
             var listGroupes = await _context.JobGroupes
@@ -39,16 +39,19 @@ namespace JobScheduler.Data
                 .Select(jg => jg.Group)
                 .ToListAsync();
 
+            IList<Node> listNodes = null;
+
             if (listGroupes == null || listGroupes.Count < 1)
             {
                 //Esecuzione su tutti i nodi esistenti
-                test.IdNodeList = _context.Nodes.Select(node => node.Id).ToList();
+                listNodes = await _context.Nodes.ToListAsync();
+                await LaunchListNodes(slaveJobModel, listNodes);
             }
             else
             {
                 foreach (var group in listGroupes)
                 {
-                    var listNodes = await _context.GroupNodes
+                    listNodes = await _context.GroupNodes
                         .Include(gn => gn.Node)
                         .Where(gn => gn.GroupId == group.Id)
                         .Select(gn => gn.Node)
@@ -59,17 +62,21 @@ namespace JobScheduler.Data
                         continue;
                     }
 
-                    foreach (var node in listNodes)
-                    {
-                        await ExecuteLaunch(node.IndirizzoIP, test);
-                    }
-                    test.IdNodeList = listNodes.Select(node => node.Id).ToList();
+                    await LaunchListNodes(slaveJobModel, listNodes);
                 }
             }
 
             return default;
         }
 
+        private static async Task LaunchListNodes(SlaveJobModel slaveJobModel, IList<Node> listNodes)
+        {
+            foreach (var node in listNodes)
+            {
+                slaveJobModel.NodeId = node.Id;
+                await ExecuteLaunch(node.IndirizzoIP, slaveJobModel);
+            }
+        }
 
         private static async Task ExecuteLaunch(string slaveIp, SlaveJobModel slaveJobModel)
         {
@@ -89,9 +96,9 @@ namespace JobScheduler.Data
                     using (var response = await httpClient.PostAsync($"{slaveUrl}", content))
                     {
                         string apiResponse = await response.Content.ReadAsStringAsync();
-                        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<List<JobResult>>(apiResponse);
+                        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<JobResult>(apiResponse);
 
-                        if (result != null && result.Count > 0)
+                        if (result != null)
                         {
 
                         }
@@ -105,8 +112,50 @@ namespace JobScheduler.Data
             }
         }
 
-
         public async Task<IActionResult> Stop(StopJob stopJob)
+        {
+
+            var listGroupes = await _context.JobGroupes
+                .Include(jg => jg.Group)
+                .Where(jg => jg.JobId == stopJob.JobId)
+                .Select(jg => jg.Group)
+                .ToListAsync();
+
+            if (listGroupes == null || listGroupes.Count < 1)
+            {
+                var listNodes = await _context.Nodes.ToListAsync();
+                foreach (var node in listNodes)
+                {
+                    return await ExecuteStop(node.IndirizzoIP, stopJob);
+                }
+            }
+            else
+            {
+                foreach (var group in listGroupes)
+                {
+                    var listNodes = await _context.GroupNodes
+                        .Include(gn => gn.Node)
+                        .Where(gn => gn.GroupId == group.Id)
+                        .Select(gn => gn.Node)
+                        .ToListAsync();
+
+                    if (listNodes == null || listNodes.Count < 1)
+                    {
+                        continue;
+                    }
+
+                    foreach (var node in listNodes)
+                    {
+                        return await ExecuteStop(node.IndirizzoIP, stopJob);
+                    }
+                }
+            }
+
+            return null;
+        }
+
+
+        public async Task<IActionResult> ExecuteStop(string slaveIp, StopJob stopJob)
         {
             string launchAction = _configuration["SlaveUrls:SlaveLaunch"];
             string slaveUrl = slaveIp + launchAction;
@@ -126,7 +175,8 @@ namespace JobScheduler.Data
             catch
             {
             }
-            return default;
+
+            return null;
         }
     }
 }
