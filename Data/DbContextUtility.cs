@@ -74,14 +74,14 @@ namespace JobScheduler.Data
             foreach (var node in listNodes)
             {
                 slaveJobModel.NodeId = node.Id;
-                await ExecuteLaunch(node.IndirizzoIP, slaveJobModel, _context);
+                await ExecuteLaunch(node, slaveJobModel, _context);
             }
         }
 
-        private static async Task ExecuteLaunch(string slaveIp, SlaveJobModel slaveJobModel, JobSchedulerContext _context)
+        private static async Task ExecuteLaunch(Node node, SlaveJobModel slaveJobModel, JobSchedulerContext _context)
         {
             string launchAction = _configuration["SlaveUrls:SlaveLaunch"];
-            string slaveUrl = slaveIp + launchAction;
+            string slaveUrl = node.IndirizzoIP + launchAction;
 
             if (string.IsNullOrWhiteSpace(slaveUrl) || slaveJobModel == null)
             {
@@ -100,6 +100,7 @@ namespace JobScheduler.Data
 
                         if (result != null)
                         {
+                            var x = new LaunchResult();
                             NodeLaunchResult nodeLaunchResult = new NodeLaunchResult
                             {
                                 JobId = slaveJobModel.Id,
@@ -107,6 +108,8 @@ namespace JobScheduler.Data
                                 Pid = result.Pid,
                                 ExitCode = result.ExitCode,
                                 StandardOutput = result.StandardOutput,
+                                LaunchResult = await _context.AddAsync(),
+                                Node = node
                             };
 
                             await _context.NodesLaunchResults.AddAsync(nodeLaunchResult);

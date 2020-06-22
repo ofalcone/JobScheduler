@@ -14,7 +14,6 @@ namespace JobScheduler.Models
 
         public int Pid { get; set; }
         public int ExitCode { get; set; }
-        public int IdNode { get; set; }
         public string StandardOutput { get; set; }
         public int JobId { get; set; }
     }
