@@ -11,7 +11,7 @@ namespace JobScheduler.Models
         public string Tipo { get; set; }
         public string Desc { get; set; }
         public string IndirizzoIP { get; set; }
-
         public ICollection<GroupNode> GroupNodes { get; set; }
+        public ICollection<NodeLaunchResult> NodeLaunchResults { get; set; }
     }
 }

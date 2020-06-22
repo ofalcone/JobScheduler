@@ -20,6 +20,7 @@ namespace JobScheduler.Data
         public DbSet<JobGroup> JobGroupes { get; set; }
         public DbSet<GroupNode> GroupNodes { get; set; }
         public DbSet<Group> Groups { get; set; }
+        public DbSet<NodeLaunchResult> NodesLaunchResults { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             => optionsBuilder.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=JobDB;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
@@ -31,6 +32,7 @@ namespace JobScheduler.Data
             modelBuilder.Entity<JobGroup>().ToTable("JobGroup");
             modelBuilder.Entity<GroupNode>().ToTable("GroupNode");
             modelBuilder.Entity<Group>().ToTable("Group");
+            modelBuilder.Entity<NodeLaunchResult>().ToTable("NodeLaunchResult");
 
             modelBuilder.Entity<JobGroup>().HasKey(jobGroup => new { jobGroup.JobId, jobGroup.GroupId });
             modelBuilder.Entity<JobGroup>().HasOne(jobGroup => jobGroup.Job).WithMany(jobGroup => jobGroup.JobGroupes);
@@ -39,6 +41,10 @@ namespace JobScheduler.Data
             modelBuilder.Entity<GroupNode>().HasKey(groupNode => new { groupNode.GroupId, groupNode.NodeId });
             modelBuilder.Entity<GroupNode>().HasOne(groupNode => groupNode.Node).WithMany(groupNode => groupNode.GroupNodes);
             modelBuilder.Entity<GroupNode>().HasOne(groupNode => groupNode.Group).WithMany(groupNode => groupNode.GroupNodes);
+
+            modelBuilder.Entity<NodeLaunchResult>().HasKey(nodeLaunchResult => new { nodeLaunchResult.NodeId, nodeLaunchResult.LaunchResultId});
+            modelBuilder.Entity<NodeLaunchResult>().HasOne(nodeLaunchResult => nodeLaunchResult.LaunchResult).WithMany(nodeLaunchResult => nodeLaunchResult.NodeLaunchResults);
+            modelBuilder.Entity<NodeLaunchResult>().HasOne(nodeLaunchResult => nodeLaunchResult.Node).WithMany(nodeLaunchResult => nodeLaunchResult.NodeLaunchResults);
 
             base.OnModelCreating(modelBuilder);
         }

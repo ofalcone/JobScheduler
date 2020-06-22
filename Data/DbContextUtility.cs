@@ -45,7 +45,7 @@ namespace JobScheduler.Data
             {
                 //Esecuzione su tutti i nodi esistenti
                 listNodes = await _context.Nodes.ToListAsync();
-                await LaunchListNodes(slaveJobModel, listNodes);
+                await LaunchListNodes(slaveJobModel, listNodes,_context);
             }
             else
             {
@@ -62,23 +62,23 @@ namespace JobScheduler.Data
                         continue;
                     }
 
-                    await LaunchListNodes(slaveJobModel, listNodes);
+                    await LaunchListNodes(slaveJobModel, listNodes, _context);
                 }
             }
 
             return default;
         }
 
-        private static async Task LaunchListNodes(SlaveJobModel slaveJobModel, IList<Node> listNodes)
+        private static async Task LaunchListNodes(SlaveJobModel slaveJobModel, IList<Node> listNodes, JobSchedulerContext _context)
         {
             foreach (var node in listNodes)
             {
                 slaveJobModel.NodeId = node.Id;
-                await ExecuteLaunch(node.IndirizzoIP, slaveJobModel);
+                await ExecuteLaunch(node.IndirizzoIP, slaveJobModel, _context);
             }
         }
 
-        private static async Task ExecuteLaunch(string slaveIp, SlaveJobModel slaveJobModel)
+        private static async Task ExecuteLaunch(string slaveIp, SlaveJobModel slaveJobModel, JobSchedulerContext _context)
         {
             string launchAction = _configuration["SlaveUrls:SlaveLaunch"];
             string slaveUrl = slaveIp + launchAction;
@@ -100,7 +100,16 @@ namespace JobScheduler.Data
 
                         if (result != null)
                         {
+                            NodeLaunchResult nodeLaunchResult = new NodeLaunchResult
+                            {
+                                JobId = slaveJobModel.Id,
+                                NodeId = slaveJobModel.NodeId,
+                                Pid = result.Pid,
+                                ExitCode = result.ExitCode,
+                                StandardOutput = result.StandardOutput,
+                            };
 
+                            await _context.NodesLaunchResults.AddAsync(nodeLaunchResult);
                         }
                         //return result;
                         //scrivere su db le info ritornate dallo slave
@@ -126,7 +135,16 @@ namespace JobScheduler.Data
                 var listNodes = await _context.Nodes.ToListAsync();
                 foreach (var node in listNodes)
                 {
-                    return await ExecuteStop(node.IndirizzoIP, stopJob);
+                    var nodeLaunchResult = await _context.NodesLaunchResults.Where(ndl => ndl.NodeId == node.Id && ndl.JobId == stopJob.JobId).FirstOrDefaultAsync();
+
+                    if (nodeLaunchResult == null)
+                    {
+                        continue;
+                    }
+
+                    nodeLaunchResult.Node = node;
+                    stopJob.Pid = nodeLaunchResult.Pid;
+                    return await ExecuteStop(nodeLaunchResult, stopJob);
                 }
             }
             else
@@ -146,7 +164,16 @@ namespace JobScheduler.Data
 
                     foreach (var node in listNodes)
                     {
-                        return await ExecuteStop(node.IndirizzoIP, stopJob);
+                        var nodeLaunchResult = await _context.NodesLaunchResults.Where(ndl => ndl.NodeId == node.Id && ndl.JobId == stopJob.JobId).FirstOrDefaultAsync();
+
+                        if (nodeLaunchResult == null)
+                        {
+                            continue;
+                        }
+
+                        nodeLaunchResult.Node = node;
+                        stopJob.Pid = nodeLaunchResult.Pid;
+                        return await ExecuteStop(nodeLaunchResult, stopJob);
                     }
                 }
             }
@@ -155,10 +182,10 @@ namespace JobScheduler.Data
         }
 
 
-        public async Task<IActionResult> ExecuteStop(string slaveIp, StopJob stopJob)
+        public async Task<IActionResult> ExecuteStop(NodeLaunchResult nodeLaunchResult, StopJob stopJob)
         {
             string launchAction = _configuration["SlaveUrls:SlaveLaunch"];
-            string slaveUrl = slaveIp + launchAction;
+            string slaveUrl = nodeLaunchResult.Node.IndirizzoIP + launchAction;
             try
             {
                 using (var httpClient = new HttpClient())
