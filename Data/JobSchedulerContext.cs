@@ -21,6 +21,8 @@ namespace JobScheduler.Data
         public DbSet<GroupNode> GroupNodes { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<NodeLaunchResult> NodesLaunchResults { get; set; }
+        public DbSet<LaunchResult> LaunchResult { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             => optionsBuilder.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=JobDB;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
@@ -33,6 +35,7 @@ namespace JobScheduler.Data
             modelBuilder.Entity<GroupNode>().ToTable("GroupNode");
             modelBuilder.Entity<Group>().ToTable("Group");
             modelBuilder.Entity<NodeLaunchResult>().ToTable("NodeLaunchResult");
+            modelBuilder.Entity<LaunchResult>().ToTable("LaunchResult");
 
             modelBuilder.Entity<JobGroup>().HasKey(jobGroup => new { jobGroup.JobId, jobGroup.GroupId });
             modelBuilder.Entity<JobGroup>().HasOne(jobGroup => jobGroup.Job).WithMany(jobGroup => jobGroup.JobGroupes);

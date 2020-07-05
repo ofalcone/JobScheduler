@@ -45,7 +45,7 @@ namespace JobScheduler.Data
             {
                 //Esecuzione su tutti i nodi esistenti
                 listNodes = await _context.Nodes.ToListAsync();
-                await LaunchListNodes(slaveJobModel, listNodes,_context);
+                await LaunchListNodes(slaveJobModel, listNodes, _context);
             }
             else
             {
@@ -101,6 +101,9 @@ namespace JobScheduler.Data
                         if (result != null)
                         {
                             var x = new LaunchResult();
+                            await _context.LaunchResult.AddAsync(x);
+                            await UtilityDatabase.TryCommit<LaunchResult>(_context, x);
+
                             NodeLaunchResult nodeLaunchResult = new NodeLaunchResult
                             {
                                 JobId = slaveJobModel.Id,
@@ -108,11 +111,12 @@ namespace JobScheduler.Data
                                 Pid = result.Pid,
                                 ExitCode = result.ExitCode,
                                 StandardOutput = result.StandardOutput,
-                                LaunchResult = await _context.AddAsync(),
+                                LaunchResult = x,
                                 Node = node
                             };
 
                             await _context.NodesLaunchResults.AddAsync(nodeLaunchResult);
+                            await UtilityDatabase.TryCommit<NodeLaunchResult>(_context, nodeLaunchResult);
                         }
                         //return result;
                         //scrivere su db le info ritornate dallo slave
@@ -167,16 +171,20 @@ namespace JobScheduler.Data
 
                     foreach (var node in listNodes)
                     {
-                        var nodeLaunchResult = await _context.NodesLaunchResults.Where(ndl => ndl.NodeId == node.Id && ndl.JobId == stopJob.JobId).FirstOrDefaultAsync();
+                        var nodeLaunchResultList = await _context.NodesLaunchResults.Where(ndl => ndl.NodeId == node.Id && ndl.JobId == stopJob.JobId && ndl.ExitCode == 0).ToListAsync();
 
-                        if (nodeLaunchResult == null)
+                        if (nodeLaunchResultList == null || nodeLaunchResultList.Count < 1)
                         {
                             continue;
                         }
 
-                        nodeLaunchResult.Node = node;
-                        stopJob.Pid = nodeLaunchResult.Pid;
-                        return await ExecuteStop(nodeLaunchResult, stopJob);
+                        foreach (var nodeLaunchResult in nodeLaunchResultList)
+                        {
+                            nodeLaunchResult.Node = node;
+                            stopJob.Pid = nodeLaunchResult.Pid;
+                            return await ExecuteStop(nodeLaunchResult, stopJob);
+                        }
+                        
                     }
                 }
             }
@@ -187,7 +195,7 @@ namespace JobScheduler.Data
 
         public async Task<IActionResult> ExecuteStop(NodeLaunchResult nodeLaunchResult, StopJob stopJob)
         {
-            string launchAction = _configuration["SlaveUrls:SlaveLaunch"];
+            string launchAction = _configuration["SlaveUrls:SlaveStop"];
             string slaveUrl = nodeLaunchResult.Node.IndirizzoIP + launchAction;
             try
             {
@@ -196,9 +204,31 @@ namespace JobScheduler.Data
                     StringContent content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(stopJob), Encoding.UTF8, "application/json");
                     using (var response = await httpClient.PostAsync($"{slaveUrl}", content))
                     {
+                        if (response == null || response.Content == null)
+                        {
+                            return null;
+                        }
+
                         string apiResponse = await response.Content.ReadAsStringAsync();
-                        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<IActionResult>(apiResponse);
-                        return result;
+                        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<JobResult>(apiResponse);
+
+                        var nodeLaunchResultFound = (from ndl in _context.NodesLaunchResults
+                                     where ndl.JobId == nodeLaunchResult.JobId
+                                     && ndl.NodeId == nodeLaunchResult.NodeId
+                                     && ndl.Pid == nodeLaunchResult.Pid
+                                     select ndl).FirstOrDefault();
+
+                        if (nodeLaunchResultFound == null)
+                        {
+                            return null;
+                        }
+
+                        //TODO: gestire il ritorno?
+                        nodeLaunchResultFound.ExitCode = result.ExitCode;
+
+                        _context.NodesLaunchResults.Update(nodeLaunchResultFound);
+
+                        await UtilityDatabase.TryCommit<NodeLaunchResult>(_context, nodeLaunchResultFound);
                     }
                 }
             }
