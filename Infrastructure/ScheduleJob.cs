@@ -1,5 +1,6 @@
 ﻿using JobScheduler.Controllers.Api;
 using JobScheduler.Data;
+using JobScheduler.Interfaces;
 using JobScheduler.Models;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -10,19 +11,19 @@ using System.Threading.Tasks;
 
 namespace JobScheduler.Infrastructure
 {
-    public class ScheduleJob : CronJobService
+    public class ScheduleJob : CronJobService, IScheduleJob
     {
-        private int id;
-        private string path;
+        private LaunchJob _launchJob;
         private readonly JobSchedulerContext _jobSchedulerContext;
         private readonly IConfiguration _configuration;
 
-        public ScheduleJob(string cronExpression, TimeZoneInfo timeZoneInfo, JobSchedulerContext jobSchedulerContext, IConfiguration configuration)
+        public ScheduleJob(string cronExpression, TimeZoneInfo timeZoneInfo, JobSchedulerContext jobSchedulerContext, IConfiguration configuration, LaunchJob launchJob)
        : base(cronExpression, timeZoneInfo)
         {
             _jobSchedulerContext = jobSchedulerContext;
             _configuration = configuration;
-            StartAsync(CancellationToken.None);
+            _launchJob = launchJob;
+            StartAsync(CancellationToken.None, launchJob);
         }
 
         //public ScheduleJob(string cronExpression, TimeZoneInfo timeZoneInfo, int id, string path) 
@@ -31,21 +32,14 @@ namespace JobScheduler.Infrastructure
         //    this.id = id;
         //    this.path = path;
         //}
-        public override Task StartAsync(CancellationToken cancellationToken)
+        public override Task StartAsync(CancellationToken cancellationToken, LaunchJob launchJob)
         {
-            return base.StartAsync(cancellationToken);
+            return base.StartAsync(cancellationToken, launchJob);
         }
-        public override async Task DoWork(CancellationToken cancellationToken)
+
+        public override async Task DoWork(CancellationToken cancellationToken, LaunchJob launchJob)
         {
             //return base.DoWork(cancellationToken);
-
-            //Call web api launch job
-            LaunchJob launchJob = new LaunchJob
-            {
-                Id = id,
-                Path = path
-            };
-
             //TODO: capire come lanciare il job usando dbContextUtility.Launch
             DbContextUtility dbContextUtility = new DbContextUtility(_jobSchedulerContext, _configuration);
             await dbContextUtility.Launch(launchJob);

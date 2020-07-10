@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using JobScheduler.Data;
 using JobScheduler.Infrastructure;
+using JobScheduler.Interfaces;
 using JobScheduler.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -63,6 +64,7 @@ namespace JobScheduler
 
             services.AddScoped<JobSchedulerDataSeed>();
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            //services.AddScoped<IScheduleJob, ScheduleJob>();
         }
 
 
@@ -99,6 +101,8 @@ namespace JobScheduler
             seed.SeedAsync().Wait();
 
             app.UseHttpContext();
+
+            //app.ApplicationServices.GetService<ScheduleJob>();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using JobScheduler.Data;
 using JobScheduler.Infrastructure;
+using JobScheduler.Interfaces;
 using JobScheduler.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JobScheduler.Abstract
@@ -141,7 +143,17 @@ namespace JobScheduler.Abstract
             var job = node as Job;
             if (node != null && _configuration != null)
             {
-                new ScheduleJob(job.Orario, TimeZoneInfo.Local, _context as JobSchedulerContext, _configuration);
+                var launchJob = new LaunchJob()
+                {
+                    Id = job.Id,
+                    Orario=job.Orario,
+                    Path = job.Path,
+                    Argomenti=job.Argomenti
+                };
+
+                IScheduleJob scheduleJob = new ScheduleJob(job.Orario, TimeZoneInfo.Local, _context as JobSchedulerContext, _configuration, launchJob); ;
+                scheduleJob.DoWork(CancellationToken.None, launchJob);
+                //new ScheduleJob(job.Orario, TimeZoneInfo.Local, _context as JobSchedulerContext, _configuration, launchJob);
             }
         }
     }

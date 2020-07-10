@@ -26,10 +26,15 @@ namespace JobScheduler.Infrastructure
 
         public virtual async Task StartAsync(CancellationToken cancellationToken)
         {
-            await ScheduleJob(cancellationToken);
+            //await ScheduleJob(cancellationToken);
         }
 
-        protected virtual async Task ScheduleJob(CancellationToken cancellationToken)
+        public virtual async Task StartAsync(CancellationToken cancellationToken, Models.LaunchJob launchJob)
+        {
+            await ScheduleJob(cancellationToken, launchJob);
+        }
+
+        protected virtual async Task ScheduleJob(CancellationToken cancellationToken, Models.LaunchJob launchJob)
         {
             var next = _expression.GetNextOccurrence(DateTimeOffset.Now, _timeZoneInfo);
             if (next.HasValue)
@@ -43,12 +48,15 @@ namespace JobScheduler.Infrastructure
 
                     if (!cancellationToken.IsCancellationRequested)
                     {
-                        await DoWork(cancellationToken);
+                        //chiama il metodo ovverridato in ScheduleJob
+                        await DoWork(cancellationToken, launchJob);
                     }
 
+                    
                     if (!cancellationToken.IsCancellationRequested)
                     {
-                        await ScheduleJob(cancellationToken);    // reschedule next
+                        //richiama se stesso per rischedulazioni
+                        await ScheduleJob(cancellationToken, launchJob);    // reschedule next
                     }
                 };
                 _timer.Start();
@@ -56,7 +64,7 @@ namespace JobScheduler.Infrastructure
             await Task.CompletedTask;
         }
 
-        public virtual async Task DoWork(CancellationToken cancellationToken)
+        public virtual async Task DoWork(CancellationToken cancellationToken, Models.LaunchJob launchJob)
         {
             await Task.Delay(5000, cancellationToken);  // do the work
         }
