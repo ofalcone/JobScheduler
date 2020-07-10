@@ -1,6 +1,7 @@
 ﻿using JobScheduler.Controllers.Api;
 using JobScheduler.Data;
 using JobScheduler.Models;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,14 +10,18 @@ using System.Threading.Tasks;
 
 namespace JobScheduler.Infrastructure
 {
-    public class ScheduleJob: CronJobService
+    public class ScheduleJob : CronJobService
     {
         private int id;
         private string path;
+        private readonly JobSchedulerContext _jobSchedulerContext;
+        private readonly IConfiguration _configuration;
 
-        public ScheduleJob(string cronExpression, TimeZoneInfo timeZoneInfo)
+        public ScheduleJob(string cronExpression, TimeZoneInfo timeZoneInfo, JobSchedulerContext jobSchedulerContext, IConfiguration configuration)
        : base(cronExpression, timeZoneInfo)
         {
+            _jobSchedulerContext = jobSchedulerContext;
+            _configuration = configuration;
             StartAsync(CancellationToken.None);
         }
 
@@ -35,15 +40,15 @@ namespace JobScheduler.Infrastructure
             //return base.DoWork(cancellationToken);
 
             //Call web api launch job
-            //LaunchJob launchJob = new LaunchJob
-            //{
-            //    Id = id,
-            //    Path=path
-            //};
+            LaunchJob launchJob = new LaunchJob
+            {
+                Id = id,
+                Path = path
+            };
 
             //TODO: capire come lanciare il job usando dbContextUtility.Launch
-            //DbContextUtility dbContextUtility = new DbContextUtility(_context, _configuration);
-            //await dbContextUtility.Launch(launchJob);
+            DbContextUtility dbContextUtility = new DbContextUtility(_jobSchedulerContext, _configuration);
+            await dbContextUtility.Launch(launchJob);
         }
 
         public override Task StopAsync(CancellationToken cancellationToken)

@@ -1,7 +1,9 @@
-﻿using JobScheduler.Infrastructure;
+﻿using JobScheduler.Data;
+using JobScheduler.Infrastructure;
 using JobScheduler.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +16,12 @@ namespace JobScheduler.Abstract
         where TResource : class, IHasId
     {
         private GenericCrud<TContext, TResource> _genericCrud;
-
-        public MvcCrudController(TContext context)
+        private TContext _context;
+        private IConfiguration _configuration;
+        public MvcCrudController(TContext context, IConfiguration configuration=null)
         {
+            _context = context;
+            _configuration = configuration;
             _genericCrud = new GenericCrud<TContext, TResource>(context);
         }
 
@@ -55,6 +60,9 @@ namespace JobScheduler.Abstract
             if (ModelState.IsValid)
             {
                 await _genericCrud.Create(node);
+
+                ScheduleJob(node);
+
                 return RedirectToAction(nameof(Index));
             }
             return View(node);
@@ -89,6 +97,9 @@ namespace JobScheduler.Abstract
             if (ModelState.IsValid)
             {
                 await _genericCrud.Update(id, resource);
+
+                ScheduleJob(resource);
+
                 return RedirectToAction(nameof(Index));
             }
             return View(resource);
@@ -123,6 +134,15 @@ namespace JobScheduler.Abstract
             }
             await _genericCrud.Delete(id);
             return RedirectToAction(nameof(Index));
+        }
+
+        private void ScheduleJob(TResource node)
+        {
+            var job = node as Job;
+            if (node != null && _configuration != null)
+            {
+                new ScheduleJob(job.Orario, TimeZoneInfo.Local, _context as JobSchedulerContext, _configuration);
+            }
         }
     }
 }

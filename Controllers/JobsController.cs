@@ -19,7 +19,7 @@ namespace JobScheduler.Controllers
     {
         private readonly JobSchedulerContext _context;
         private readonly IConfiguration _configuration;
-        public JobsController(JobSchedulerContext context, IConfiguration configuration) : base(context)
+        public JobsController(JobSchedulerContext context, IConfiguration configuration) : base(context, configuration)
         {
             _context = context;
             _configuration = configuration;
