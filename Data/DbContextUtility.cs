@@ -47,9 +47,11 @@ namespace JobScheduler.Data
 
             if (listGroupes == null || listGroupes.Count < 1)
             {
-                //Esecuzione su tutti i nodi esistenti
-                var masterLaunchResult = MasterLaunchJob(slaveJobModel, _context);
+                //Esecuzione su tutti i nodi esistenti + nodo master è l'unico sul db avente Tipo==0
                 Node masterNode = await _context.Nodes.Where(node => node.Tipo == NodeType.Master).FirstAsync();
+                slaveJobModel.NodeId = masterNode.Id;
+                var masterLaunchResult = MasterLaunchJob(slaveJobModel, _context);
+                
                 await SaveLaunchResult(masterNode,slaveJobModel, _context,masterLaunchResult);
                 listNodes = await _context.Nodes.ToListAsync();
                 await LaunchListNodes(slaveJobModel, listNodes, _context);
