@@ -32,14 +32,14 @@ namespace JobScheduler.Controllers.Api
             _configuration = configuration;
         }
 
-        [HttpPost]
+        [HttpPost("[action]")]
         public async Task<object> Launch(LaunchJob launchJob)
         {
             DbContextUtility dbContextUtility = new DbContextUtility(_context, _configuration);
             return await dbContextUtility.Launch(launchJob);
         }
 
-        [HttpPost]
+        [HttpPost("[action]")]
         public async Task<IActionResult> Stop(StopJob stopJob)
         {
             DbContextUtility dbContextUtility = new DbContextUtility(_context, _configuration);

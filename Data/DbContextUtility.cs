@@ -1,20 +1,24 @@
-﻿using JobScheduler.Infrastructure;
+﻿using JobScheduler.Enums;
+using JobScheduler.Infrastructure;
 using JobScheduler.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JobScheduler.Data
 {
     public class DbContextUtility
     {
+        private static string readOut;
         private readonly JobSchedulerContext _context;
         private static IConfiguration _configuration;
 
@@ -44,6 +48,9 @@ namespace JobScheduler.Data
             if (listGroupes == null || listGroupes.Count < 1)
             {
                 //Esecuzione su tutti i nodi esistenti
+                var masterLaunchResult = MasterLaunchJob(slaveJobModel, _context);
+                Node masterNode = await _context.Nodes.Where(node => node.Tipo == NodeType.Master).FirstAsync();
+                await SaveLaunchResult(masterNode,slaveJobModel, _context,masterLaunchResult);
                 listNodes = await _context.Nodes.ToListAsync();
                 await LaunchListNodes(slaveJobModel, listNodes, _context);
             }
@@ -97,35 +104,105 @@ namespace JobScheduler.Data
                     {
                         string apiResponse = await response.Content.ReadAsStringAsync();
                         var result = Newtonsoft.Json.JsonConvert.DeserializeObject<JobResult>(apiResponse);
-
-                        if (result != null)
-                        {
-                            var x = new LaunchResult();
-                            await _context.LaunchResult.AddAsync(x);
-                            await UtilityDatabase.TryCommit<LaunchResult>(_context, x);
-
-                            NodeLaunchResult nodeLaunchResult = new NodeLaunchResult
-                            {
-                                JobId = slaveJobModel.Id,
-                                NodeId = slaveJobModel.NodeId,
-                                Pid = result.Pid,
-                                ExitCode = result.ExitCode,
-                                StandardOutput = result.StandardOutput,
-                                LaunchResult = x,
-                                Node = node
-                            };
-
-                            await _context.NodesLaunchResults.AddAsync(nodeLaunchResult);
-                            await UtilityDatabase.TryCommit<NodeLaunchResult>(_context, nodeLaunchResult);
-                        }
-                        //return result;
-                        //scrivere su db le info ritornate dallo slave
+                        await SaveLaunchResult(node, slaveJobModel, _context, result);
                     }
                 }
             }
             catch
             {
             }
+        }
+
+        private static async Task SaveLaunchResult(Node node, SlaveJobModel slaveJobModel, JobSchedulerContext _context, JobResult result)
+        {
+            if (result != null)
+            {
+                var x = new LaunchResult();
+                await _context.LaunchResult.AddAsync(x);
+                await UtilityDatabase.TryCommit<LaunchResult>(_context, x);
+
+                NodeLaunchResult nodeLaunchResult = new NodeLaunchResult
+                {
+                    JobId = slaveJobModel.Id,
+                    NodeId = slaveJobModel.NodeId,
+                    Pid = result.Pid,
+                    ExitCode = result.ExitCode,
+                    StandardOutput = result.StandardOutput,
+                    LaunchResult = x,
+                    Node = node
+                };
+
+                //Il risultato che viene scritto nella JobGroup sarebbe quello dell'esecuzione dell'ultimo nodo -> non utile
+                //if (groupId != 0)
+                //{
+                //    var jobGroup = await _context.JobGroupes.FindAsync(slaveJobModel.Id, groupId);
+                //    jobGroup.LastExecutionDate = DateTime.Now;
+                //    jobGroup.Pid = result.Pid;
+                //    jobGroup.OutputResult = result.StandardOutput;
+                //    jobGroup.ExecutionResult = Enums.ExecutionEnum.Success;
+                //}
+
+
+                await _context.NodesLaunchResults.AddAsync(nodeLaunchResult);
+                await UtilityDatabase.TryCommit<NodeLaunchResult>(_context, nodeLaunchResult);
+            }
+        }
+
+        private static JobResult MasterLaunchJob(SlaveJobModel slaveJobModel, JobSchedulerContext _context)
+        {
+            if (slaveJobModel == null
+                || string.IsNullOrWhiteSpace(slaveJobModel.Path)
+                || slaveJobModel.NodeId == 0)
+            {
+                return null;
+            }
+            JobResult jobResult = new JobResult();
+
+            try
+            {
+                using (Process process = new Process())
+                {
+                    process.StartInfo.FileName = slaveJobModel.Path;
+                    if (string.IsNullOrWhiteSpace(slaveJobModel.Argomenti) == false)
+                    {
+                        process.StartInfo.Arguments = $"\"{slaveJobModel.Argomenti}\"";
+                    }
+                    process.StartInfo.UseShellExecute = false;
+                    process.StartInfo.RedirectStandardOutput = true;
+
+                    process.OutputDataReceived += new DataReceivedEventHandler(HandleOutputData);
+                    //process.OutputDataReceived += (sender, args) => readOut = args.Data;
+                    process.Start();
+                    process.BeginOutputReadLine();
+                    //readOut = process.StandardOutput.ReadToEnd();
+
+                    //var output = new List<string>();
+
+                    //while (process.StandardOutput.Peek() > -1)
+                    //{
+                    //    output.Add(process.StandardOutput.ReadLine());
+                    //}
+
+                    jobResult.Pid = process.Id;
+                    jobResult.IdNode = slaveJobModel.NodeId;
+                    if (string.IsNullOrWhiteSpace(readOut))
+                    {
+                        Thread.Sleep(500);
+                    }
+                    jobResult.StandardOutput = readOut;
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
+            return jobResult;
+        }
+
+        private static void HandleOutputData(object sender, DataReceivedEventArgs e)
+        {
+            readOut = e.Data;
         }
 
         public async Task<IActionResult> Stop(StopJob stopJob)
@@ -238,5 +315,7 @@ namespace JobScheduler.Data
 
             return null;
         }
+
+     
     }
 }

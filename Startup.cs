@@ -42,8 +42,8 @@ namespace JobScheduler
 
             //Ogni utente può avere N ruoli, il ruolo è una stringa
             //config server per impostare dei parametri di autenticazione
-            services.AddIdentity<User, IdentityRole>(config =>
-             { config.User.RequireUniqueEmail = true; })
+            services.AddIdentity<User, IdentityRole>(
+                config => { config.User.RequireUniqueEmail = true; })
                 .AddEntityFrameworkStores<JobSchedulerContext>()
                 .AddDefaultTokenProviders();
 
