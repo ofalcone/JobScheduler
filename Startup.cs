@@ -112,6 +112,13 @@ namespace JobScheduler
             });
 
             using var scope = app.ApplicationServices.CreateScope();
+
+            
+            var context = scope.ServiceProvider.GetRequiredService<JobSchedulerContext>();
+            //Se abbiamo una migration che crea il db
+            //context.Database.Migrate();
+            context.Database.EnsureCreated();
+
             var seed = scope.ServiceProvider.GetService<JobSchedulerDataSeed>();
             seed.SeedAsync().Wait();
 

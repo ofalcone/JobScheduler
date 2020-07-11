@@ -57,16 +57,6 @@ namespace JobScheduler.Data
             await CreateTestGroupNode(listGroups, listNodes);
         }
 
-        //private async Task<User> CreateEditorUser()
-        //{
-        //    string userName = _configuration["EditorUserInfo:User"];
-        //    string password = _configuration["EditorUserInfo:Password"];
-        //    string firstName = _configuration["EditorUserInfo:FirstName"];
-        //    string lastname = _configuration["EditorUserInfo:LastName"];
-
-        //    return await CreateUser(userName, password, firstName, lastname);
-        //}
-
         private async Task CreateUserRole(IdentityRole role, User user)
         {
             if (role == null || user == null) return;
@@ -177,7 +167,7 @@ namespace JobScheduler.Data
             var result = _context.Nodes.Count();
             if (result < 1)
             {
-                Node node1 = new Node { Desc = "Node1" };
+                Node node1 = new Node { Desc = "Master", Tipo = Enums.NodeType.Master,IndirizzoIP = };
                 Node node2 = new Node { Desc = "Node2" };
                 Node node3 = new Node { Desc = "Node3" };
 
