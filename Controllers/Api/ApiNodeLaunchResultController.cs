@@ -8,27 +8,30 @@ using JobScheduler.Infrastructure;
 using JobScheduler.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
-namespace JobScheduler.Controllers
+namespace JobScheduler.Controllers.Api
 {
-    [Authorize(Roles = Constants.ADMIN_ROLE + "," + Constants.EDITOR_ROLE)]
-    public class NodeLaunchResultController : Controller
+    [Authorize(Roles = Constants.ADMIN_ROLE + "," + Constants.EDITOR_ROLE, AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ApiNodeLaunchResultController : ControllerBase
     {
         private readonly JobSchedulerContext _context;
         private readonly NodeLaunchResultUtility _nodeLaunchResultUtility;
 
         //public JobGroupsController(JobSchedulerContext context):base(context)
-        public NodeLaunchResultController(JobSchedulerContext context)
+        public ApiNodeLaunchResultController(JobSchedulerContext context)
         {
             _context = context;
             _nodeLaunchResultUtility = new NodeLaunchResultUtility(context);
         }
 
-        public async Task<IActionResult> Index()
+        [HttpGet]
+        public async Task<IEnumerable<NodeLaunchResult>> Get()
         {
-            return View(await _nodeLaunchResultUtility.GetAll());
+            return await _nodeLaunchResultUtility.GetAll();
         }
     }
 }

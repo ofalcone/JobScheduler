@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
@@ -85,30 +86,36 @@ namespace JobScheduler.Controllers
                     {
                         try
                         {
-                            var tokenHandler = new JwtSecurityTokenHandler();
-                            var key = Encoding.ASCII.GetBytes(_configuration["Tokens:Key"]);
-                            //meta informazioni da inserire dei token jwt 
-                            var tokenDescriptor = new SecurityTokenDescriptor
+                            var roles = await _userManager.GetRolesAsync(user);
+                            if (roles != null && roles.Count > 0)
                             {
-                                Subject = new ClaimsIdentity(new Claim[]
+                                var tokenHandler = new JwtSecurityTokenHandler();
+                                var key = Encoding.ASCII.GetBytes(_configuration["Tokens:Key"]);
+
+                                //meta informazioni da inserire dei token jwt 
+                                var tokenDescriptor = new SecurityTokenDescriptor
                                 {
-                                new Claim(ClaimTypes.Name, user.Id.ToString()),
-                                new Claim(ClaimTypes.Role, Constants.ADMIN_ROLE)
-                                }),
-                                //se voglio che i token non scadano, possono mettere un valore molto alto
-                                Expires = DateTime.UtcNow.AddDays(7),
-                                //algoritmo di cifratura
-                                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-                            };
+                                    Subject = new ClaimsIdentity(new Claim[]
+                                    {
+                                        new Claim(ClaimTypes.Name, user.Id.ToString()),
+                                        new Claim(ClaimTypes.Role, roles?.FirstOrDefault())
+                                    }),
 
-                            var token = tokenHandler.CreateToken(tokenDescriptor);
+                                    //se voglio che i token non scadano, possono mettere un valore molto alto
+                                    Expires = DateTime.UtcNow.AddDays(7),
+                                    //algoritmo di cifratura
+                                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                                };
 
-                            return Ok(new
-                            {
-                                //converto oggetto tokendescri in stringa per passarla al client
-                                Token = tokenHandler.WriteToken(token),
-                                Expiration = token.ValidTo,
-                            });
+                                var token = tokenHandler.CreateToken(tokenDescriptor);
+
+                                return Ok(new
+                                {
+                                    //converto oggetto tokendescri in stringa per passarla al client
+                                    Token = tokenHandler.WriteToken(token),
+                                    Expiration = token.ValidTo,
+                                });
+                            }
                         }
                         catch (Exception ex)
                         {
