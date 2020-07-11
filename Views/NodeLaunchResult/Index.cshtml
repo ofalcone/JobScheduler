@@ -12,9 +12,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.Node)
             </th>
-            <th>
+            @*<th>
                 @Html.DisplayNameFor(model => model.LaunchResult)
-            </th>
+            </th>*@
             <th>
                 @Html.DisplayNameFor(model => model.Pid)
             </th>
@@ -34,11 +34,11 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Node.Id)
+                @Html.DisplayFor(modelItem => item.NodeId)
             </td>
-            <td>
+            @*<td>
                 @Html.DisplayFor(modelItem => item.LaunchResult.Id)
-            </td>
+            </td>*@
             <td>
                 @Html.DisplayFor(modelItem => item.Pid)
             </td>

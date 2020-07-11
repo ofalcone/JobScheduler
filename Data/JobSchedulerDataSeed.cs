@@ -51,7 +51,7 @@ namespace JobScheduler.Data
             var listJobs = await CreateTestJobs();
             var listGroups = await CreateTestGroups();
             var listNodes = await CreateTestNodes();
-            
+
             await CreateTestJobGroup(listJobs, listGroups);
 
             await CreateTestGroupNode(listGroups, listNodes);
@@ -143,9 +143,14 @@ namespace JobScheduler.Data
             var result = _context.Jobs.Count();
             if (result < 1)
             {
-                Job job1 = new Job { Orario = "30 9 17 05 *", Path = Path.Combine("C:/temp/chrome.exe"), Description = "launch chrome" };
-                Job job2 = new Job { Orario = "30 9 17 05 *", Path = Path.Combine("C:/temp/firefox.exe"), Description = "launch firefox" };
-                Job job3 = new Job { Orario = "30 9 17 05 *", Path = Path.Combine("C:/temp/edge.exe"), Description = "launch edge" };
+                string currentProjectPath = UtilityDatabase.GetApplicationRoot();
+                string executablePath = "LaunchExe/test.exe";
+                string executableLocation = Path.Combine(currentProjectPath, executablePath);
+                string defaultCron = "";
+
+                Job job1 = new Job { Orario = defaultCron, Path = executableLocation, Description = "test job1" };
+                Job job2 = new Job { Orario = defaultCron, Path = executableLocation, Description = "test job2" };
+                Job job3 = new Job { Orario = defaultCron, Path = executableLocation, Description = "test job3" };
 
                 _context.Jobs.AddRange(job1, job2, job3);
 
@@ -167,9 +172,9 @@ namespace JobScheduler.Data
             var result = _context.Nodes.Count();
             if (result < 1)
             {
-                Node node1 = new Node { Desc = "Master", Tipo = Enums.NodeType.Master,IndirizzoIP = };
-                Node node2 = new Node { Desc = "Node2" };
-                Node node3 = new Node { Desc = "Node3" };
+                Node node1 = new Node { Desc = "Master", Tipo = Enums.NodeType.Master, IndirizzoIP = "https://localhost:5001" };
+                Node node2 = new Node { Desc = "Node1", IndirizzoIP = _configuration["SlaveUrls:BaseHttpsUrl"] };
+                Node node3 = new Node { Desc = "Node2", IndirizzoIP = _configuration["SlaveUrls:BaseHttpsUrl"] };
 
                 _context.Nodes.AddRange(node1, node2, node3);
 
@@ -212,7 +217,16 @@ namespace JobScheduler.Data
 
         private async Task CreateTestJobGroup(List<Job> listJobs, List<Group> listGroups)
         {
+            if (listJobs == null
+                || listJobs.Count < 1
+                || listGroups == null
+                || listGroups.Count < 1)
+            {
+                return;
+            }
+
             var result = _context.JobGroupes.Count();
+
             if (result < 1)
             {
                 var job = listJobs.FirstOrDefault();
@@ -230,7 +244,16 @@ namespace JobScheduler.Data
         }
         private async Task CreateTestGroupNode(List<Group> listGroups, List<Node> listNodes)
         {
+            if (listNodes == null
+                || listNodes.Count < 1
+                || listGroups == null
+                || listGroups.Count < 1)
+            {
+                return;
+            }
+
             var result = _context.GroupNodes.Count();
+
             if (result < 1)
             {
                 var node = listNodes.FirstOrDefault();
@@ -239,8 +262,8 @@ namespace JobScheduler.Data
                 {
                     Group = group,
                     GroupId = group.Id,
-                    Node=node,
-                    NodeId=node.Id
+                    Node = node,
+                    NodeId = node.Id
                 };
                 _context.GroupNodes.Add(groupNode);
                 await UtilityDatabase.TryCommit<GroupNode>(_context);
