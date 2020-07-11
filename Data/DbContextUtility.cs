@@ -82,6 +82,15 @@ namespace JobScheduler.Data
         {
             foreach (var node in listNodes)
             {
+                //Se nel gruppo associato al job è presente il nodo Master, devo lanciare l'eseguibile direttamente da Master
+                if (node.Tipo == NodeType.Master)
+                {
+                    slaveJobModel.NodeId = node.Id;
+                    var masterLaunchResult = MasterLaunchJob(slaveJobModel, _context);
+                    await SaveLaunchResult(node, slaveJobModel, _context, masterLaunchResult);
+                    continue;
+                }
+
                 slaveJobModel.NodeId = node.Id;
                 await ExecuteLaunch(node, slaveJobModel, _context);
             }
