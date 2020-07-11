@@ -12,9 +12,12 @@ using System.Text;
 using JobScheduler.Infrastructure;
 using JobScheduler.Abstract;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace JobScheduler.Controllers.Api
 {
+    [Authorize(Roles = Constants.ADMIN_ROLE,AuthenticationSchemes =JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     public class ApiJobsController : CrudController<JobSchedulerContext, Job>

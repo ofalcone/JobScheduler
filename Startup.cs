@@ -30,7 +30,8 @@ namespace JobScheduler
 
         public IConfiguration Configuration { get; }
 
-
+        //The ConfigureServices() method does not allow injecting services, it only accepts an IServiceCollection argument.
+        //This makes sense because ConfigureServices() is where you register the services required by your application.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
@@ -50,8 +51,12 @@ namespace JobScheduler
                     .AddCookie()
                     .AddJwtBearer(config =>
                     {
+                        config.RequireHttpsMetadata = false;
+                        config.SaveToken = true;
                         config.TokenValidationParameters = new TokenValidationParameters
                         {
+                            ValidateIssuerSigningKey = true,
+                            //Encoding.ASCII.GetBytes(appSettings.Secret);
                             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Tokens:Key"])),
                             //chi emette il jwt
                             ValidateIssuer = false,
@@ -61,10 +66,20 @@ namespace JobScheduler
                             //tutti e due in false perche "ci serviamo" di jwt per l autenticazione
                         };
                     });
-
+            //IdentityModelEventSource.ShowPII = true;
             services.AddScoped<JobSchedulerDataSeed>();
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
-            //services.AddScoped<IScheduleJob, ScheduleJob>();
+
+            //esplode
+            //services.AddScoped<ScheduleJob>(); 
+
+            //services.AddSingleton<IScheduleJob, ScheduleJob>();
+
+            //// Build the intermediate service provider
+            //var sp = services.BuildServiceProvider();
+
+            //// This will succeed.
+            //var jobSchedulerService = sp.GetService<IScheduleJob>();
         }
 
 

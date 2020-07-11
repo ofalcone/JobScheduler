@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Security.Claims;
@@ -72,7 +73,7 @@ namespace JobScheduler.Controllers
             return View();
         }
 
-        [HttpPost]
+        [HttpPost, Route("[controller]/[action]")]
         public async Task<IActionResult> CreateToken([FromBody] LoginViewModel model)
         {
             if (ModelState.IsValid)
@@ -82,29 +83,37 @@ namespace JobScheduler.Controllers
                 {
                     if (await _userManager.CheckPasswordAsync(user, model.Password))
                     {
-                        var tokenHandler = new JwtSecurityTokenHandler();
-                        var key = Encoding.ASCII.GetBytes(_configuration["Tokens:Key"]);
-                        //meta informazioni da inserire dei token jwt 
-                        var tokenDescriptor = new SecurityTokenDescriptor
+                        try
                         {
-                            Subject = new ClaimsIdentity(new Claim[]
+                            var tokenHandler = new JwtSecurityTokenHandler();
+                            var key = Encoding.ASCII.GetBytes(_configuration["Tokens:Key"]);
+                            //meta informazioni da inserire dei token jwt 
+                            var tokenDescriptor = new SecurityTokenDescriptor
                             {
+                                Subject = new ClaimsIdentity(new Claim[]
+                                {
                                 new Claim(ClaimTypes.Name, user.Id.ToString()),
                                 new Claim(ClaimTypes.Role, Constants.ADMIN_ROLE)
-                            }),
-                            //se voglio che i token non scadano, possono mettere un valore molto alto
-                            Expires = DateTime.UtcNow.AddDays(7),
-                            //algoritmo di cifratura
-                            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-                        };
-                        var token = tokenHandler.CreateToken(tokenDescriptor);
+                                }),
+                                //se voglio che i token non scadano, possono mettere un valore molto alto
+                                Expires = DateTime.UtcNow.AddDays(7),
+                                //algoritmo di cifratura
+                                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                            };
 
-                        return Ok(new
+                            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+                            return Ok(new
+                            {
+                                //converto oggetto tokendescri in stringa per passarla al client
+                                Token = tokenHandler.WriteToken(token),
+                                Expiration = token.ValidTo,
+                            });
+                        }
+                        catch (Exception ex)
                         {
-                            //converto oggetto tokendescri in stringa per passarla al client
-                            Token = tokenHandler.WriteToken(token),
-                            Expiration = token.ValidTo,
-                        });
+                            throw ex;
+                        }
                     }
                 }
             }

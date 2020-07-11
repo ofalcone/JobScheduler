@@ -5,6 +5,7 @@ using JobScheduler.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,10 +21,18 @@ namespace JobScheduler.Abstract
         private GenericCrud<TContext, TResource> _genericCrud;
         private TContext _context;
         private IConfiguration _configuration;
-        public MvcCrudController(TContext context, IConfiguration configuration=null)
+        private readonly IServiceScopeFactory _scopeFactory;
+        //public MvcCrudController(TContext context, IConfiguration configuration=null)
+        //{
+        //    _context = context;
+        //    _configuration = configuration;
+        //    _genericCrud = new GenericCrud<TContext, TResource>(context);
+        //}    
+        public MvcCrudController(TContext context, IServiceScopeFactory scopeFactory=null, IConfiguration configuration = null)
         {
             _context = context;
             _configuration = configuration;
+            _scopeFactory = scopeFactory;
             _genericCrud = new GenericCrud<TContext, TResource>(context);
         }
 
@@ -151,7 +160,7 @@ namespace JobScheduler.Abstract
                     Argomenti=job.Argomenti
                 };
 
-                IScheduleJob scheduleJob = new ScheduleJob(job.Orario, TimeZoneInfo.Local, _context as JobSchedulerContext, _configuration, launchJob); ;
+                IScheduleJob scheduleJob = new ScheduleJob(job.Orario, TimeZoneInfo.Local, launchJob, _scopeFactory, _configuration); ;
                 scheduleJob.DoWork(CancellationToken.None, launchJob);
                 //new ScheduleJob(job.Orario, TimeZoneInfo.Local, _context as JobSchedulerContext, _configuration, launchJob);
             }

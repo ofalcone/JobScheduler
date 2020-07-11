@@ -3,6 +3,7 @@ using JobScheduler.Data;
 using JobScheduler.Interfaces;
 using JobScheduler.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,11 +17,20 @@ namespace JobScheduler.Infrastructure
         private LaunchJob _launchJob;
         private readonly JobSchedulerContext _jobSchedulerContext;
         private readonly IConfiguration _configuration;
+        private readonly IServiceScopeFactory _scopeFactory;
+        // public ScheduleJob(string cronExpression, TimeZoneInfo timeZoneInfo, JobSchedulerContext jobSchedulerContext, IConfiguration configuration, LaunchJob launchJob)
+        //: base(cronExpression, timeZoneInfo)
+        // {
+        //     _jobSchedulerContext = jobSchedulerContext;
+        //     _configuration = configuration;
+        //     _launchJob = launchJob;
+        //     StartAsync(CancellationToken.None, launchJob);
+        // }
 
-        public ScheduleJob(string cronExpression, TimeZoneInfo timeZoneInfo, JobSchedulerContext jobSchedulerContext, IConfiguration configuration, LaunchJob launchJob)
-       : base(cronExpression, timeZoneInfo)
+        public ScheduleJob(string cronExpression, TimeZoneInfo timeZoneInfo, LaunchJob launchJob, IServiceScopeFactory scopeFactory, IConfiguration configuration)
+   : base(cronExpression, timeZoneInfo)
         {
-            _jobSchedulerContext = jobSchedulerContext;
+            _scopeFactory = scopeFactory;
             _configuration = configuration;
             _launchJob = launchJob;
             StartAsync(CancellationToken.None, launchJob);
@@ -41,8 +51,17 @@ namespace JobScheduler.Infrastructure
         {
             //return base.DoWork(cancellationToken);
             //TODO: capire come lanciare il job usando dbContextUtility.Launch
-            DbContextUtility dbContextUtility = new DbContextUtility(_jobSchedulerContext, _configuration);
-            await dbContextUtility.Launch(launchJob);
+            
+
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var dbcontext= scope.ServiceProvider.GetRequiredService<JobSchedulerContext>();
+                DbContextUtility dbContextUtility = new DbContextUtility(dbcontext, _configuration);
+                await dbContextUtility.Launch(launchJob);
+
+            }
+
+           
         }
 
         public override Task StopAsync(CancellationToken cancellationToken)

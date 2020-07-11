@@ -53,11 +53,11 @@ namespace JobScheduler.Infrastructure
                     }
 
                     
-                    if (!cancellationToken.IsCancellationRequested)
-                    {
-                        //richiama se stesso per rischedulazioni
-                        await ScheduleJob(cancellationToken, launchJob);    // reschedule next
-                    }
+                    //if (!cancellationToken.IsCancellationRequested)
+                    //{
+                    //    //richiama se stesso per rischedulazioni
+                    //    await ScheduleJob(cancellationToken, launchJob);    // reschedule next
+                    //}
                 };
                 _timer.Start();
             }

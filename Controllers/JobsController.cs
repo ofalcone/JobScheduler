@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using JobScheduler.Infrastructure;
 using JobScheduler.Abstract;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace JobScheduler.Controllers
 {
@@ -19,7 +20,8 @@ namespace JobScheduler.Controllers
     {
         private readonly JobSchedulerContext _context;
         private readonly IConfiguration _configuration;
-        public JobsController(JobSchedulerContext context, IConfiguration configuration) : base(context, configuration)
+        private readonly IServiceScopeFactory _scopeFactory;
+        public JobsController(JobSchedulerContext context, IConfiguration configuration, IServiceScopeFactory _scopeFactory) : base(context, _scopeFactory, configuration)
         {
             _context = context;
             _configuration = configuration;
