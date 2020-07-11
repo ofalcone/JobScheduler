@@ -15,7 +15,7 @@ namespace JobScheduler.Infrastructure
     public class ScheduleJob : CronJobService, IScheduleJob
     {
         private LaunchJob _launchJob;
-        private readonly JobSchedulerContext _jobSchedulerContext;
+        //private readonly JobSchedulerContext _jobSchedulerContext;
         private readonly IConfiguration _configuration;
         private readonly IServiceScopeFactory _scopeFactory;
         // public ScheduleJob(string cronExpression, TimeZoneInfo timeZoneInfo, JobSchedulerContext jobSchedulerContext, IConfiguration configuration, LaunchJob launchJob)

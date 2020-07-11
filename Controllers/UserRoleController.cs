@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace JobScheduler.Controllers
 {
@@ -73,7 +74,7 @@ namespace JobScheduler.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-       
+
         public async Task<IActionResult> Edit([Bind("UserId,RoleId")] string userId, string roleId)
         {
             if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(roleId))
@@ -81,7 +82,7 @@ namespace JobScheduler.Controllers
                 return NotFound();
             }
 
-            var userRoleViewModel= await _userRoleUtility.GetSingle(userId, roleId);
+            var userRoleViewModel = await _userRoleUtility.GetSingle(userId, roleId);
 
             if (userRoleViewModel == null)
             {
@@ -138,6 +139,6 @@ namespace JobScheduler.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-     
+
     }
 }

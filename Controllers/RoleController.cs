@@ -10,6 +10,7 @@ using JobScheduler.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace JobScheduler.Controllers
 {
@@ -17,7 +18,7 @@ namespace JobScheduler.Controllers
     public class RoleController : Controller
     {
         private readonly RolesUtility _roleUtility;
-        public RoleController(RoleManager<IdentityRole> roleManager,JobSchedulerContext context)
+        public RoleController(RoleManager<IdentityRole> roleManager, JobSchedulerContext context)
         {
             _roleUtility = new RolesUtility(roleManager, context);
         }

@@ -11,6 +11,7 @@ using JobScheduler.Abstract;
 using JobScheduler.ViewModels;
 using JobScheduler.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace JobScheduler.Controllers
 {
@@ -42,7 +43,7 @@ namespace JobScheduler.Controllers
             return View(jobGroup);
         }
 
-     
+
         public IActionResult Create()
         {
             ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Desc");
@@ -59,7 +60,7 @@ namespace JobScheduler.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-     
+
         public async Task<IActionResult> Edit(JobGroup jobGroup)
         {
             bool exist = await _jobGroupsUtility.JobGroupExists(jobGroup);

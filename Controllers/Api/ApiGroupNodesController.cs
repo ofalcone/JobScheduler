@@ -6,6 +6,7 @@ using JobScheduler.Data;
 using JobScheduler.Infrastructure;
 using JobScheduler.Models;
 using JobScheduler.ViewModels;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,7 @@ namespace JobScheduler.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = Constants.ADMIN_ROLE)]
+    [Authorize(Roles = Constants.ADMIN_ROLE, AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ApiGroupNodesController : ControllerBase
     {
 

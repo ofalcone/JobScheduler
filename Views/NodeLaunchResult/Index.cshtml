@@ -1,0 +1,62 @@
+﻿@model IEnumerable<JobScheduler.Models.NodeLaunchResult>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Node)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LaunchResult)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Pid)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ExitCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StandardOutput)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.JobId)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Node.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LaunchResult.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Pid)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ExitCode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StandardOutput)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.JobId)
+            </td>
+            @*<td>
+                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+            </td>*@
+        </tr>
+}
+    </tbody>
+</table>

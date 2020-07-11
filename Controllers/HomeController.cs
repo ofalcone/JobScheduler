@@ -7,10 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using JobScheduler.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using JobScheduler.Infrastructure;
 
 namespace JobScheduler.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = Constants.ADMIN_ROLE + "," + Constants.EDITOR_ROLE)]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

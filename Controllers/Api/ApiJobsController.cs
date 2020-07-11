@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace JobScheduler.Controllers.Api
 {
-    [Authorize(Roles = Constants.ADMIN_ROLE,AuthenticationSchemes =JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(Roles = Constants.ADMIN_ROLE + "," + Constants.EDITOR_ROLE, AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     public class ApiJobsController : CrudController<JobSchedulerContext, Job>

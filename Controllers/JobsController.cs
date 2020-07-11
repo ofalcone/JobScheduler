@@ -12,15 +12,16 @@ using JobScheduler.Infrastructure;
 using JobScheduler.Abstract;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace JobScheduler.Controllers
 {
-    [Authorize]
-    public class JobsController : MvcCrudController<JobSchedulerContext,Job>
+    [Authorize(Roles = Constants.ADMIN_ROLE + "," + Constants.EDITOR_ROLE)]
+    public class JobsController : MvcCrudController<JobSchedulerContext, Job>
     {
         private readonly JobSchedulerContext _context;
         private readonly IConfiguration _configuration;
-        private readonly IServiceScopeFactory _scopeFactory;
+        //private readonly IServiceScopeFactory _scopeFactory;
         public JobsController(JobSchedulerContext context, IConfiguration configuration, IServiceScopeFactory _scopeFactory) : base(context, _scopeFactory, configuration)
         {
             _context = context;
@@ -31,7 +32,7 @@ namespace JobScheduler.Controllers
         //Scrivere da qualche parte le info di ritorno
         public async Task<object> Launch(LaunchJob launchJob)
         {
-            DbContextUtility dbContextUtility = new DbContextUtility(_context,_configuration);
+            DbContextUtility dbContextUtility = new DbContextUtility(_context, _configuration);
             return await dbContextUtility.Launch(launchJob);
         }
 

@@ -10,6 +10,7 @@ using JobScheduler.Models;
 using Microsoft.AspNetCore.Authorization;
 using JobScheduler.Infrastructure;
 using JobScheduler.Abstract;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace JobScheduler.Controllers
 {

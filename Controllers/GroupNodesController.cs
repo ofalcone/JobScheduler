@@ -10,6 +10,7 @@ using JobScheduler.Models;
 using Microsoft.AspNetCore.Authorization;
 using JobScheduler.Infrastructure;
 using JobScheduler.ViewModels;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace JobScheduler.Controllers
 {
@@ -84,7 +85,7 @@ namespace JobScheduler.Controllers
 
             ViewData["GroupId"] = new SelectList(_context.Groups, nameof(Group.Id), nameof(Group.Desc), groupNode.GroupId);
             ViewData["NodeId"] = new SelectList(_context.Nodes, nameof(Node.Id), nameof(Node.Desc), groupNode.NodeId);
-            
+
             return View(groupNodeViewModel);
         }
 

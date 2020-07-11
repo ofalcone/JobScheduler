@@ -40,9 +40,13 @@ namespace JobScheduler.Data
 
         public async Task SeedAsync()
         {
-            var adminRole = await CreateAdminRole();
-            var adminUser = await CreateAdminUser();
-            await CreateAdminRole(adminRole, adminUser);
+            var adminRole = await CreateRoleByName(Constants.ADMIN_ROLE);
+            var editorRole = await CreateRoleByName(Constants.EDITOR_ROLE);
+            var adminUser = await CreateUser(Constants.ADMIN_KEY);
+            var editorUser = await CreateUser(Constants.EDITOR_KEY);
+
+            await CreateUserRole(adminRole, adminUser);
+            await CreateUserRole(editorRole, editorUser);
 
             var listJobs = await CreateTestJobs();
             var listGroups = await CreateTestGroups();
@@ -53,19 +57,28 @@ namespace JobScheduler.Data
             await CreateTestGroupNode(listGroups, listNodes);
         }
 
+        //private async Task<User> CreateEditorUser()
+        //{
+        //    string userName = _configuration["EditorUserInfo:User"];
+        //    string password = _configuration["EditorUserInfo:Password"];
+        //    string firstName = _configuration["EditorUserInfo:FirstName"];
+        //    string lastname = _configuration["EditorUserInfo:LastName"];
 
-        private async Task CreateAdminRole(IdentityRole adminRole, User adminUser)
+        //    return await CreateUser(userName, password, firstName, lastname);
+        //}
+
+        private async Task CreateUserRole(IdentityRole role, User user)
         {
-            if (adminRole == null || adminUser == null) return;
+            if (role == null || user == null) return;
 
-            await _userManager.AddToRoleAsync(adminUser, adminRole.Name);
+            await _userManager.AddToRoleAsync(user, role.Name);
 
             await UtilityDatabase.TryCommit<Node>(_context);
         }
 
-        private async Task<IdentityRole> CreateAdminRole()
+        private async Task<IdentityRole> CreateRoleByName(string tipoRuolo)
         {
-            const string tipoRuolo = Constants.ADMIN_ROLE;
+            //const string tipoRuolo = Constants.ADMIN_ROLE;
 
             var foundRole = await _roleManager.FindByNameAsync(tipoRuolo);
 
@@ -91,15 +104,24 @@ namespace JobScheduler.Data
             return foundRole;
         }
 
-        private async Task<User> CreateAdminUser()
+        //private async Task<User> CreateAdminUser()
+        //{
+        //    string userName = _configuration["AdminUserInfo:User"];
+        //    string password = _configuration["AdminUserInfo:Password"];
+        //    string firstName = _configuration["AdminUserInfo:FirstName"];
+        //    string lastname = _configuration["AdminUserInfo:LastName"];
+
+        //    return await CreateUser(userName, password, firstName, lastname);
+        //}
+
+        private async Task<User> CreateUser(string userKey)
         {
-            string userName = _configuration["AdminUserInfo:User"];
-            string password = _configuration["AdminUserInfo:Password"];
-            string firstName = _configuration["AdminUserInfo:FirstName"];
-            string lastname = _configuration["AdminUserInfo:LastName"];
+            string userName = _configuration[$"{userKey}Info:User"];
+            string password = _configuration[$"{userKey}Info:Password"];
+            string firstName = _configuration[$"{userKey}Info:FirstName"];
+            string lastname = _configuration[$"{userKey}Info:LastName"];
 
-
-        User user = await _userManager.FindByEmailAsync(userName);
+            User user = await _userManager.FindByEmailAsync(userName);
             if (user == null)
             {
                 user = new User
@@ -119,7 +141,7 @@ namespace JobScheduler.Data
                 }
             }
 
-            user = await UtilityDatabase.TryCommit<User>(_context,user);
+            user = await UtilityDatabase.TryCommit<User>(_context, user);
 
             return user;
         }
