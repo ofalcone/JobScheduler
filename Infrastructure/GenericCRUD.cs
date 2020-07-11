@@ -43,7 +43,8 @@ namespace JobScheduler.Infrastructure
         public async Task<bool> Update(int id, TResource resource)
         {
             bool result = false;
-            if (id != resource.Id)
+            Node nodo = resource as Node;
+            if (id != resource.Id || (nodo != null && nodo.Tipo == Enums.NodeType.Master))
             {
                 return result;
             }
@@ -80,7 +81,8 @@ namespace JobScheduler.Infrastructure
         public async Task<bool> Delete(int id)
         {
             var resource = await Table.FindAsync(id);
-            if (resource == null)
+            Node nodo = resource as Node;
+            if (resource == null || (nodo != null && nodo.Tipo == Enums.NodeType.Master))
             {
                 return false;
             }

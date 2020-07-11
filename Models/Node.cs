@@ -8,6 +8,11 @@ namespace JobScheduler.Models
 {
     public class Node: IHasId
     {
+        public Node()
+        {
+            Tipo = NodeType.Slave;
+        }
+
         public int Id { get; set; }
         public NodeType Tipo { get; set; }
         public string Desc { get; set; }

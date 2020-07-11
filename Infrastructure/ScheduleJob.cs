@@ -52,16 +52,12 @@ namespace JobScheduler.Infrastructure
             //return base.DoWork(cancellationToken);
             //TODO: capire come lanciare il job usando dbContextUtility.Launch
             
-
             using (var scope = _scopeFactory.CreateScope())
             {
                 var dbcontext= scope.ServiceProvider.GetRequiredService<JobSchedulerContext>();
                 DbContextUtility dbContextUtility = new DbContextUtility(dbcontext, _configuration);
                 await dbContextUtility.Launch(launchJob);
-
             }
-
-           
         }
 
         public override Task StopAsync(CancellationToken cancellationToken)
