@@ -14,25 +14,14 @@ namespace JobScheduler.Infrastructure
 {
     public class ScheduleJob : CronJobService, IScheduleJob
     {
-        private LaunchJob _launchJob;
-        //private readonly JobSchedulerContext _jobSchedulerContext;
         private readonly IConfiguration _configuration;
         private readonly IServiceScopeFactory _scopeFactory;
-        // public ScheduleJob(string cronExpression, TimeZoneInfo timeZoneInfo, JobSchedulerContext jobSchedulerContext, IConfiguration configuration, LaunchJob launchJob)
-        //: base(cronExpression, timeZoneInfo)
-        // {
-        //     _jobSchedulerContext = jobSchedulerContext;
-        //     _configuration = configuration;
-        //     _launchJob = launchJob;
-        //     StartAsync(CancellationToken.None, launchJob);
-        // }
 
         public ScheduleJob(string cronExpression, TimeZoneInfo timeZoneInfo, LaunchJob launchJob, IServiceScopeFactory scopeFactory, IConfiguration configuration)
         : base(cronExpression, timeZoneInfo)
         {
             _scopeFactory = scopeFactory;
             _configuration = configuration;
-            _launchJob = launchJob;
             StartAsync(CancellationToken.None, launchJob);
         }
 

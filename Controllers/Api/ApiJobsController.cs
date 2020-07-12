@@ -24,26 +24,49 @@ namespace JobScheduler.Controllers.Api
     {
         private readonly JobSchedulerContext _context;
         private readonly IConfiguration _configuration;
-        //private SlaveUtility slaveUtility;
+
         public ApiJobsController(JobSchedulerContext context, IConfiguration configuration) : base(context)
         {
             _context = context;
-            //slaveUtility = new SlaveUtility(context);
             _configuration = configuration;
         }
 
         [HttpPost("[action]")]
-        public async Task<object> Launch(LaunchJob launchJob)
+        public async Task<IActionResult> Launch(LaunchJob launchJob)
         {
+            //if (!System.IO.Directory.Exists(launchJob.Path))
+            //{
+            //    return BadRequest();
+            //}
+
             DbContextUtility dbContextUtility = new DbContextUtility(_context, _configuration);
-            return await dbContextUtility.Launch(launchJob);
+            var result = await dbContextUtility.Launch(launchJob);
+
+            if (result)
+            {
+                return Ok();
+            }
+
+            return NotFound();
         }
 
         [HttpPost("[action]")]
         public async Task<IActionResult> Stop(StopJob stopJob)
         {
+            if (stopJob.JobId == 0 || stopJob.Pid == 0)
+            {
+                return BadRequest();
+            }
+
             DbContextUtility dbContextUtility = new DbContextUtility(_context, _configuration);
-            return await dbContextUtility.Stop(stopJob);
+            var result = await dbContextUtility.Stop(stopJob);
+
+            if (result)
+            {
+                return Ok();
+            }
+
+            return NotFound();
         }
 
     }

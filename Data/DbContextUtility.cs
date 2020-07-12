@@ -19,9 +19,10 @@ namespace JobScheduler.Data
 {
     public class DbContextUtility
     {
-        private static string readOut;
         private readonly JobSchedulerContext _context;
         private static IConfiguration _configuration;
+        private static string readOut;
+        int exitCode = -999;
 
         public DbContextUtility(JobSchedulerContext context, IConfiguration configuration)
         {
@@ -29,7 +30,7 @@ namespace JobScheduler.Data
             _configuration = configuration;
         }
 
-        public async Task<object> Launch(LaunchJob launchJob)
+        public async Task<bool> Launch(LaunchJob launchJob)
         {
             SlaveJobModel slaveJobModel = new SlaveJobModel
             {
@@ -76,7 +77,7 @@ namespace JobScheduler.Data
                 }
             }
 
-            return default;
+            return true;
         }
 
         private static async Task LaunchListNodes(SlaveJobModel slaveJobModel, IList<Node> listNodes, JobSchedulerContext _context)
@@ -144,17 +145,6 @@ namespace JobScheduler.Data
                     Node = node
                 };
 
-                //Il risultato che viene scritto nella JobGroup sarebbe quello dell'esecuzione dell'ultimo nodo -> non utile
-                //if (groupId != 0)
-                //{
-                //    var jobGroup = await _context.JobGroupes.FindAsync(slaveJobModel.Id, groupId);
-                //    jobGroup.LastExecutionDate = DateTime.Now;
-                //    jobGroup.Pid = result.Pid;
-                //    jobGroup.OutputResult = result.StandardOutput;
-                //    jobGroup.ExecutionResult = Enums.ExecutionEnum.Success;
-                //}
-
-
                 await _context.NodesLaunchResults.AddAsync(nodeLaunchResult);
                 await UtilityDatabase.TryCommit<NodeLaunchResult>(_context, nodeLaunchResult);
             }
@@ -167,7 +157,7 @@ namespace JobScheduler.Data
             {
                 return null;
             }
-            JobResult jobResult = new JobResult();
+            JobResult jobResult = null;
 
             try
             {
@@ -176,12 +166,17 @@ namespace JobScheduler.Data
                     string currentProjectPath = string.Empty;
                     string executablePath = string.Empty;
 
-                    if (string.IsNullOrWhiteSpace(slaveJobModel.Path))
+                    currentProjectPath = UtilityDatabase.GetApplicationRoot();
+                    executablePath = _configuration["ExecutableInfo:Path"];
+
+                    string launchPath = Path.Combine(currentProjectPath, executablePath);
+
+                    if (string.IsNullOrWhiteSpace(launchPath))
                     {
-                        currentProjectPath = UtilityDatabase.GetApplicationRoot();
-                        executablePath = _configuration["ExecutableInfo:Path"];
-                        process.StartInfo.FileName = Path.Combine(currentProjectPath, executablePath);
+                        return jobResult;
                     }
+
+                    process.StartInfo.FileName = launchPath;
 
                     if (string.IsNullOrWhiteSpace(slaveJobModel.Argomenti) == false)
                     {
@@ -191,6 +186,8 @@ namespace JobScheduler.Data
                     process.StartInfo.UseShellExecute = false;
                     process.StartInfo.RedirectStandardOutput = true;
                     process.OutputDataReceived += new DataReceivedEventHandler(HandleOutputData);
+
+                    jobResult = new JobResult();
 
                     process.Start();
                     process.BeginOutputReadLine();
@@ -220,7 +217,7 @@ namespace JobScheduler.Data
             readOut = e.Data;
         }
 
-        public async Task<IActionResult> Stop(StopJob stopJob)
+        public async Task<bool> Stop(StopJob stopJob)
         {
 
             var listGroupes = await _context.JobGroupes
@@ -241,9 +238,19 @@ namespace JobScheduler.Data
                         continue;
                     }
 
+                    if (node.Tipo == NodeType.Master)
+                    {
+                        nodeLaunchResult.Node = node;
+                        stopJob.Pid = nodeLaunchResult.Pid;
+
+                        var masterStopResult = MasterStopJob(stopJob);
+                        await SaveStopResult(nodeLaunchResult, masterStopResult);
+                        continue;
+                    }
+
                     nodeLaunchResult.Node = node;
                     stopJob.Pid = nodeLaunchResult.Pid;
-                    return await ExecuteStop(nodeLaunchResult, stopJob);
+                    await ExecuteStop(nodeLaunchResult, stopJob);
                 }
             }
             else
@@ -272,20 +279,74 @@ namespace JobScheduler.Data
 
                         foreach (var nodeLaunchResult in nodeLaunchResultList)
                         {
+
+                            if (node.Tipo == NodeType.Master)
+                            {
+                                nodeLaunchResult.Node = node;
+                                stopJob.Pid = nodeLaunchResult.Pid;
+
+                                var masterStopResult = MasterStopJob(stopJob);
+                                await SaveStopResult(nodeLaunchResult, masterStopResult);
+                                continue;
+                            }
+
                             nodeLaunchResult.Node = node;
                             stopJob.Pid = nodeLaunchResult.Pid;
-                            return await ExecuteStop(nodeLaunchResult, stopJob);
+                            await ExecuteStop(nodeLaunchResult, stopJob);
                         }
 
                     }
                 }
             }
 
-            return null;
+            return true;
         }
 
+        public JobResult MasterStopJob(StopJob stopJob)
+        {
+            bool killProcessTree = false;
+            JobResult jobResult = null;
 
-        public async Task<IActionResult> ExecuteStop(NodeLaunchResult nodeLaunchResult, StopJob stopJob)
+            if (stopJob.Pid == 0)
+            {
+                return jobResult;
+            }
+
+            try
+            {
+                var processFound = Process.GetProcessById(stopJob.Pid);
+                processFound.EnableRaisingEvents = true;
+                processFound.Exited += ProcessEnded;
+                processFound.Kill(killProcessTree);
+                processFound.WaitForExit();
+
+                if (processFound != null)
+                {
+                    jobResult = new JobResult
+                    {
+                        Pid = stopJob.Pid,
+                        ExitCode = exitCode
+                    };
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
+            return jobResult;
+        }
+
+        private void ProcessEnded(object sender, EventArgs e)
+        {
+            var process = sender as Process;
+            if (process != null)
+            {
+                exitCode = process.ExitCode;
+            }
+        }
+
+        public async Task ExecuteStop(NodeLaunchResult nodeLaunchResult, StopJob stopJob)
         {
             string launchAction = _configuration["SlaveUrls:SlaveStop"];
             string slaveUrl = nodeLaunchResult.Node.IndirizzoIP + launchAction;
@@ -298,29 +359,13 @@ namespace JobScheduler.Data
                     {
                         if (response == null || response.Content == null)
                         {
-                            return null;
+                            return;
                         }
 
                         string apiResponse = await response.Content.ReadAsStringAsync();
                         var result = Newtonsoft.Json.JsonConvert.DeserializeObject<JobResult>(apiResponse);
 
-                        var nodeLaunchResultFound = (from ndl in _context.NodesLaunchResults
-                                                     where ndl.JobId == nodeLaunchResult.JobId
-                                                     && ndl.NodeId == nodeLaunchResult.NodeId
-                                                     && ndl.Pid == nodeLaunchResult.Pid
-                                                     select ndl).FirstOrDefault();
-
-                        if (nodeLaunchResultFound == null)
-                        {
-                            return null;
-                        }
-
-                        //TODO: gestire il ritorno?
-                        nodeLaunchResultFound.ExitCode = result.ExitCode;
-
-                        _context.NodesLaunchResults.Update(nodeLaunchResultFound);
-
-                        await UtilityDatabase.TryCommit<NodeLaunchResult>(_context, nodeLaunchResultFound);
+                        await SaveStopResult(nodeLaunchResult, result);
                     }
                 }
             }
@@ -328,9 +373,30 @@ namespace JobScheduler.Data
             {
             }
 
-            return null;
+            return;
         }
 
+        private async Task SaveStopResult(NodeLaunchResult nodeLaunchResult, JobResult result)
+        {
+            var nodeLaunchResultFound = (from ndl in _context.NodesLaunchResults
+                                         where ndl.JobId == nodeLaunchResult.JobId
+                                         && ndl.NodeId == nodeLaunchResult.NodeId
+                                         && ndl.Pid == nodeLaunchResult.Pid
+                                         select ndl).FirstOrDefault();
 
+            if (nodeLaunchResultFound == null || result == null)
+            {
+                return;
+            }
+
+            //TODO: gestire il ritorno?
+            nodeLaunchResultFound.ExitCode = result.ExitCode;
+
+            _context.NodesLaunchResults.Update(nodeLaunchResultFound);
+
+            await UtilityDatabase.TryCommit<NodeLaunchResult>(_context, nodeLaunchResultFound);
+
+            return;
+        }
     }
 }

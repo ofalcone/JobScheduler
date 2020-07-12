@@ -22,25 +22,34 @@ namespace JobScheduler.Controllers
         private readonly JobSchedulerContext _context;
         private readonly IConfiguration _configuration;
         //private readonly IServiceScopeFactory _scopeFactory;
-        public JobsController(JobSchedulerContext context, IConfiguration configuration, IServiceScopeFactory _scopeFactory) : base(context, _scopeFactory, configuration)
+        public JobsController(JobSchedulerContext context, IConfiguration configuration, IServiceScopeFactory _scopeFactory)
+            : base(context, _scopeFactory, configuration)
         {
             _context = context;
             _configuration = configuration;
         }
 
-
-        //Scrivere da qualche parte le info di ritorno
-        public async Task<object> Launch(LaunchJob launchJob)
+        public async Task<IActionResult> Launch(LaunchJob launchJob)
         {
+
             DbContextUtility dbContextUtility = new DbContextUtility(_context, _configuration);
-            return await dbContextUtility.Launch(launchJob);
+            await dbContextUtility.Launch(launchJob);
+
+            return RedirectToAction(nameof(Index));
         }
 
-        //Dove prendo il pid da killare? ho il job id ma manca il groupId dove è stato eseguito
-        public async Task<object> Stop(StopJob stopJob)
+        public async Task<IActionResult> Stop(StopJob stopJob)
         {
+            if (stopJob.JobId == 0 )
+            {
+                //Gestirla con una schermata di errore ad hoc
+                return RedirectToAction(nameof(Index));
+            }
+
             DbContextUtility dbContextUtility = new DbContextUtility(_context, _configuration);
-            return await dbContextUtility.Stop(stopJob);
+            await dbContextUtility.Stop(stopJob);
+            return RedirectToAction(nameof(Index));
+
         }
     }
 }

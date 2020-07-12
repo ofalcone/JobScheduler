@@ -151,9 +151,7 @@ namespace JobScheduler.Abstract
                     Argomenti=job.Argomenti
                 };
 
-                IScheduleJob scheduleJob = new ScheduleJob(job.Orario, TimeZoneInfo.Local, launchJob, _scopeFactory, _configuration); ;
-                scheduleJob.DoWork(CancellationToken.None, launchJob);
-                //new ScheduleJob(job.Orario, TimeZoneInfo.Local, _context as JobSchedulerContext, _configuration, launchJob);
+               new ScheduleJob(job.Orario, TimeZoneInfo.Local, launchJob, _scopeFactory, _configuration); ;
             }
         }
     }

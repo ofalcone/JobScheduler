@@ -45,8 +45,15 @@ namespace JobScheduler.Data
             var adminUser = await CreateUser(Constants.ADMIN_KEY);
             var editorUser = await CreateUser(Constants.EDITOR_KEY);
 
-            await CreateUserRole(adminRole, adminUser);
-            await CreateUserRole(editorRole, editorUser);
+            if (adminUser != null)
+            {
+                await CreateUserRole(adminRole, adminUser);
+            }
+
+            if (editorUser != null)
+            {
+                await CreateUserRole(editorRole, editorUser);
+            }
 
             var listJobs = await CreateTestJobs();
             var listGroups = await CreateTestGroups();
@@ -92,6 +99,11 @@ namespace JobScheduler.Data
             return foundRole;
         }
 
+        /// <summary>
+        /// Find user by name, if null create a new User
+        /// </summary>
+        /// <param name="userKey"></param>
+        /// <returns>User if created, else null </returns>
         private async Task<User> CreateUser(string userKey)
         {
             string userName = _configuration[$"{userKey}Info:User"];
@@ -111,15 +123,21 @@ namespace JobScheduler.Data
                 };
 
                 var result = await _userManager.CreateAsync(user, password);
-                user = await _userManager.FindByEmailAsync(userName);
+                //user = await _userManager.FindByEmailAsync(userName);
 
-                if (!result.Succeeded)
+                if (result != null && result.Succeeded)
+                {
+                    user = await UtilityDatabase.TryCommit<User>(_context, user);
+                }
+                else
                 {
                     user = null;
                 }
             }
-
-            user = await UtilityDatabase.TryCommit<User>(_context, user);
+            else
+            {
+                user = null;
+            }
 
             return user;
         }
@@ -136,9 +154,9 @@ namespace JobScheduler.Data
                 string executableLocation = Path.Combine(currentProjectPath, executablePath);
                 string defaultCron = "";
 
-                Job job1 = new Job { Orario = defaultCron, Path = executableLocation, Description = "test job1" };
-                Job job2 = new Job { Orario = defaultCron, Path = executableLocation, Description = "test job2" };
-                Job job3 = new Job { Orario = defaultCron, Path = executableLocation, Description = "test job3" };
+                Job job1 = new Job { Orario = defaultCron, Path = executableLocation, Description = "test master", Argomenti = "test master" };
+                Job job2 = new Job { Orario = defaultCron, Path = executableLocation, Description = "test job 1", Argomenti = "test job 1" };
+                Job job3 = new Job { Orario = defaultCron, Path = executableLocation, Description = "test job 2", Argomenti = "test job 2" };
 
                 _context.Jobs.AddRange(job1, job2, job3);
 

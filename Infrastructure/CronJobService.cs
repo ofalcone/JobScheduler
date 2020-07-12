@@ -16,19 +16,20 @@ namespace JobScheduler.Infrastructure
     {
         //!= System.Threading.Timer
         private System.Timers.Timer _timer;
-        private readonly CronExpression _expression;
+        private readonly CronExpression _cronExpression;
         private readonly TimeZoneInfo _timeZoneInfo;
 
         protected CronJobService(string cronExpression, TimeZoneInfo timeZoneInfo)
         {
-            _expression = CronExpression.Parse(cronExpression);
+            _cronExpression = CronExpression.Parse(cronExpression);
             _timeZoneInfo = timeZoneInfo;
         }
 
         public virtual async Task StartAsync(CancellationToken cancellationToken)
         {
-            //await ScheduleJob(cancellationToken);
+            await Task.Delay(100, cancellationToken);
         }
+
 
         public virtual async Task StartAsync(CancellationToken cancellationToken, Models.LaunchJob launchJob)
         {
@@ -37,10 +38,10 @@ namespace JobScheduler.Infrastructure
 
         protected virtual async Task ScheduleJob(CancellationToken cancellationToken, Models.LaunchJob launchJob)
         {
-            var next = _expression.GetNextOccurrence(DateTimeOffset.Now, _timeZoneInfo);
-            if (next.HasValue)
+            var userTimeChosen = _cronExpression.GetNextOccurrence(DateTimeOffset.Now, _timeZoneInfo);
+            if (userTimeChosen.HasValue)
             {
-                var delay = next.Value - DateTimeOffset.Now;
+                var delay = userTimeChosen.Value - DateTimeOffset.Now;
                 _timer = new System.Timers.Timer(delay.TotalMilliseconds);
                 _timer.Elapsed += async (sender, args) =>
                 {
@@ -52,13 +53,6 @@ namespace JobScheduler.Infrastructure
                         //chiama il metodo ovverridato in ScheduleJob
                         await DoWork(cancellationToken, launchJob);
                     }
-
-                    
-                    //if (!cancellationToken.IsCancellationRequested)
-                    //{
-                    //    //richiama se stesso per rischedulazioni
-                    //    await ScheduleJob(cancellationToken, launchJob);    // reschedule next
-                    //}
                 };
                 _timer.Start();
             }
@@ -67,7 +61,7 @@ namespace JobScheduler.Infrastructure
 
         public virtual async Task DoWork(CancellationToken cancellationToken, Models.LaunchJob launchJob)
         {
-            await Task.Delay(5000, cancellationToken);  // do the work
+            await Task.Delay(5000, cancellationToken);
         }
 
         public virtual async Task StopAsync(CancellationToken cancellationToken)
