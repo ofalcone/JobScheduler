@@ -31,13 +31,11 @@ namespace JobScheduler.Controllers
             _userRoleUtility = new UserRoleUtility(_userUtility, _roleUtility, _context);
         }
 
-
         public async Task<ActionResult> Index()
         {
             List<UserRoleViewModel> userRoleViewModels = await _userRoleUtility.GetUserRoles();
             return View(userRoleViewModels.ToArray());
         }
-
 
         public async Task<ActionResult> Details([Bind("userId", "roleId")]string userId, string roleId)
         {
@@ -50,7 +48,6 @@ namespace JobScheduler.Controllers
             return View(userRoleViewModel);
         }
 
-
         public IActionResult Create()
         {
             var users = _userUtility.GetUsers();
@@ -59,7 +56,6 @@ namespace JobScheduler.Controllers
             ViewData["RoleId"] = new SelectList(roles, "Id", "Name");
             return View();
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -73,7 +69,6 @@ namespace JobScheduler.Controllers
             await _userRoleUtility.CreateUserRole(userId, roleId);
             return RedirectToAction(nameof(Index));
         }
-
 
         public async Task<IActionResult> Edit([Bind("UserId,RoleId")] string userId, string roleId)
         {
@@ -94,7 +89,6 @@ namespace JobScheduler.Controllers
             return View(userRoleViewModel);
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EditConfirmed([Bind("UserId,RoleId")] string userId, string roleId)
@@ -106,7 +100,6 @@ namespace JobScheduler.Controllers
             await _userRoleUtility.Update(userId, roleId);
             return RedirectToAction(nameof(Index));
         }
-
 
         public async Task<ActionResult> Delete([Bind("UserId,RoleId")] string userId, string roleId)
         {
@@ -124,7 +117,6 @@ namespace JobScheduler.Controllers
             }
             return View(userRoleViewModel);
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]

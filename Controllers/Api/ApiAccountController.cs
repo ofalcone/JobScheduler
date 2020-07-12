@@ -16,13 +16,11 @@ namespace JobScheduler.Controllers.Api
     [ApiController]
     public class ApiAccountController : ControllerBase
     {
-        private readonly SignInManager<User> _signInManager;
         private readonly IConfiguration _configuration;
         private readonly UserManager<User> _userManager;
 
-        public ApiAccountController(SignInManager<User> signInManager, IConfiguration configuration, UserManager<User> userManager)
+        public ApiAccountController(IConfiguration configuration, UserManager<User> userManager)
         {
-            _signInManager = signInManager;
             _configuration = configuration;
             _userManager = userManager;
         }

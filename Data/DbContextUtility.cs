@@ -126,30 +126,6 @@ namespace JobScheduler.Data
             }
         }
 
-        private static async Task SaveLaunchResult(Node node, SlaveJobModel slaveJobModel, JobSchedulerContext _context, JobResult result)
-        {
-            if (result != null)
-            {
-                var x = new LaunchResult();
-                await _context.LaunchResult.AddAsync(x);
-                await UtilityDatabase.TryCommit<LaunchResult>(_context, x);
-
-                NodeLaunchResult nodeLaunchResult = new NodeLaunchResult
-                {
-                    JobId = slaveJobModel.Id,
-                    NodeId = slaveJobModel.NodeId,
-                    Pid = result.Pid,
-                    ExitCode = result.ExitCode,
-                    StandardOutput = result.StandardOutput,
-                    LaunchResult = x,
-                    Node = node
-                };
-
-                await _context.NodesLaunchResults.AddAsync(nodeLaunchResult);
-                await UtilityDatabase.TryCommit<NodeLaunchResult>(_context, nodeLaunchResult);
-            }
-        }
-
         private static JobResult MasterLaunchJob(SlaveJobModel slaveJobModel, JobSchedulerContext _context)
         {
             if (slaveJobModel == null
@@ -210,6 +186,30 @@ namespace JobScheduler.Data
             }
 
             return jobResult;
+        }
+
+        private static async Task SaveLaunchResult(Node node, SlaveJobModel slaveJobModel, JobSchedulerContext _context, JobResult result)
+        {
+            if (result != null)
+            {
+                var x = new LaunchResult();
+                await _context.LaunchResult.AddAsync(x);
+                await UtilityDatabase.TryCommit<LaunchResult>(_context, x);
+
+                NodeLaunchResult nodeLaunchResult = new NodeLaunchResult
+                {
+                    JobId = slaveJobModel.Id,
+                    NodeId = slaveJobModel.NodeId,
+                    Pid = result.Pid,
+                    ExitCode = result.ExitCode,
+                    StandardOutput = result.StandardOutput,
+                    LaunchResult = x,
+                    Node = node
+                };
+
+                await _context.NodesLaunchResults.AddAsync(nodeLaunchResult);
+                await UtilityDatabase.TryCommit<NodeLaunchResult>(_context, nodeLaunchResult);
+            }
         }
 
         private static void HandleOutputData(object sender, DataReceivedEventArgs e)
@@ -336,16 +336,7 @@ namespace JobScheduler.Data
 
             return jobResult;
         }
-
-        private void ProcessEnded(object sender, EventArgs e)
-        {
-            var process = sender as Process;
-            if (process != null)
-            {
-                exitCode = process.ExitCode;
-            }
-        }
-
+      
         public async Task ExecuteStop(NodeLaunchResult nodeLaunchResult, StopJob stopJob)
         {
             string launchAction = _configuration["SlaveUrls:SlaveStop"];
@@ -398,5 +389,15 @@ namespace JobScheduler.Data
 
             return;
         }
+
+        private void ProcessEnded(object sender, EventArgs e)
+        {
+            var process = sender as Process;
+            if (process != null)
+            {
+                exitCode = process.ExitCode;
+            }
+        }
+
     }
 }

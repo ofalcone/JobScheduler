@@ -18,16 +18,15 @@ namespace JobScheduler.Controllers
     public class UsersController : Controller
     {
         private readonly UserManager<User> _userManager;
-        //private JobSchedulerContext _context;
         private readonly UserUtility _userUtility;
+
         public UsersController(UserManager<User> userManager, JobSchedulerContext context)
         {
             _userManager = userManager;
-            //_context = context;
             _userUtility = new UserUtility(userManager, context);
         }
 
-        // GET: Users
+
         [HttpGet]
         public ActionResult Index()
         {
@@ -56,8 +55,6 @@ namespace JobScheduler.Controllers
             return View();
         }
 
-
-        // POST: Users/Create
         [HttpPost]
         public async Task<IActionResult> Create(UserViewModel userView)
         {
@@ -72,7 +69,6 @@ namespace JobScheduler.Controllers
             }
             return RedirectToAction("Create");
         }
-
 
         public async Task<IActionResult> Edit(string id)
         {
@@ -89,8 +85,6 @@ namespace JobScheduler.Controllers
                 return RedirectToAction(nameof(Index));
         }
 
-
-        // POST: Nodes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(UserViewModel userViewModel)
@@ -108,8 +102,6 @@ namespace JobScheduler.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
-        // GET: Nodes/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
@@ -125,8 +117,6 @@ namespace JobScheduler.Controllers
                 return RedirectToAction(nameof(Index));
         }
 
-
-        // POST: Nodes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
@@ -144,7 +134,6 @@ namespace JobScheduler.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
-
 
         void Errors(IdentityResult result)
         {

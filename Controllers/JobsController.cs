@@ -21,7 +21,7 @@ namespace JobScheduler.Controllers
     {
         private readonly JobSchedulerContext _context;
         private readonly IConfiguration _configuration;
-        //private readonly IServiceScopeFactory _scopeFactory;
+
         public JobsController(JobSchedulerContext context, IConfiguration configuration, IServiceScopeFactory _scopeFactory)
             : base(context, _scopeFactory, configuration)
         {
@@ -49,7 +49,6 @@ namespace JobScheduler.Controllers
             DbContextUtility dbContextUtility = new DbContextUtility(_context, _configuration);
             await dbContextUtility.Stop(stopJob);
             return RedirectToAction(nameof(Index));
-
         }
     }
 }

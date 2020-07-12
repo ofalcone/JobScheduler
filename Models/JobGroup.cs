@@ -12,10 +12,6 @@ namespace JobScheduler.Models
         public int GroupId { get; set; }
         public Job Job { get; set; }
         public Group Group { get; set; }
-        //public DateTime LastExecutionDate { get; set; }
-        //public ExecutionEnum ExecutionResult { get; set; }
-        //public int Pid { get; set; }
-        //public string OutputResult { get; set; }
 
     }
 }

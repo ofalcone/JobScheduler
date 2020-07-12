@@ -21,7 +21,6 @@ namespace JobScheduler.Controllers.Api
         private readonly JobSchedulerContext _context;
         private readonly NodeLaunchResultUtility _nodeLaunchResultUtility;
 
-        //public JobGroupsController(JobSchedulerContext context):base(context)
         public ApiNodeLaunchResultController(JobSchedulerContext context)
         {
             _context = context;

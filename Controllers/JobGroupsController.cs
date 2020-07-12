@@ -21,19 +21,16 @@ namespace JobScheduler.Controllers
         private readonly JobSchedulerContext _context;
         private readonly JobGroupsUtility _jobGroupsUtility;
 
-        //public JobGroupsController(JobSchedulerContext context):base(context)
         public JobGroupsController(JobSchedulerContext context)
         {
             _context = context;
             _jobGroupsUtility = new JobGroupsUtility(context);
         }
 
-
         public async Task<IActionResult> Index()
         {
             return View(await _jobGroupsUtility.GetAll());
         }
-
 
         public async Task<IActionResult> Details(JobGroup jobGroup)
         {
@@ -43,14 +40,12 @@ namespace JobScheduler.Controllers
             return View(jobGroup);
         }
 
-
         public IActionResult Create()
         {
             ViewData["GroupId"] = new SelectList(_context.Groups, "Id", "Desc");
             ViewData["JobId"] = new SelectList(_context.Jobs, "Id", "Description");
             return View();
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -59,7 +54,6 @@ namespace JobScheduler.Controllers
             await _jobGroupsUtility.CreateSingle(jobGroup);
             return RedirectToAction(nameof(Index));
         }
-
 
         public async Task<IActionResult> Edit(JobGroup jobGroup)
         {
@@ -82,7 +76,6 @@ namespace JobScheduler.Controllers
             return View(jobGroupViewModel);
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(JobGroupViewModel jobGroupViewModel)
@@ -99,7 +92,6 @@ namespace JobScheduler.Controllers
 
         }
 
-
         public async Task<IActionResult> Delete(JobGroup jobGroup)
         {
             bool exist = await _jobGroupsUtility.JobGroupExists(jobGroup);
@@ -114,7 +106,6 @@ namespace JobScheduler.Controllers
             jobGroup.Job = await _context.Jobs.FindAsync(jobGroup.JobId);
             return View(jobGroup);
         }
-
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]

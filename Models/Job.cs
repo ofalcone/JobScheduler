@@ -7,7 +7,6 @@ namespace JobScheduler.Models
 {
     public class Job: IHasId
     {
-        
         public int Id { get; set; }
         public string Path { get; set; }
         public string Orario { get; set; }

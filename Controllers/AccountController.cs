@@ -19,14 +19,10 @@ namespace JobScheduler.Controllers
     public class AccountController : Controller
     {
         private readonly SignInManager<User> _signInManager;
-        private readonly IConfiguration _configuration;
-        private readonly UserManager<User> _userManager;
 
-        public AccountController(SignInManager<User> signInManager, IConfiguration configuration, UserManager<User> userManager)
+        public AccountController(SignInManager<User> signInManager)
         {
             _signInManager = signInManager;
-            _configuration = configuration;
-            _userManager = userManager;
         }
 
         [HttpGet]

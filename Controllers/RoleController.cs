@@ -29,7 +29,6 @@ namespace JobScheduler.Controllers
             return View(_roleUtility.GetRoles());
         }
 
-
         public async Task<IActionResult> Details(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
@@ -45,14 +44,12 @@ namespace JobScheduler.Controllers
             return View(role);
         }
 
-
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Roles/Create
         [HttpPost]
         public async Task<IActionResult> Create(IdentityRole role)
         {
@@ -68,7 +65,6 @@ namespace JobScheduler.Controllers
             return RedirectToAction("Create");
         }
 
-
         public async Task<IActionResult> Edit(string id)
         {
             IdentityRole user = await _roleUtility.GetRoleById(id);
@@ -79,8 +75,6 @@ namespace JobScheduler.Controllers
                 return RedirectToAction(nameof(Index));
         }
 
-
-        // POST: Nodes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(IdentityRole role)
@@ -97,38 +91,5 @@ namespace JobScheduler.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
-
-
-        // GET: Nodes/Delete/5
-        //public async Task<IActionResult> Delete(string id)
-        //{
-        //    IdentityRole user = await _roleUtility.GetRoleById(id);
-
-        //    if (user != null)
-        //        return View(user);
-        //    else
-        //        return RedirectToAction(nameof(Index));
-        //}
-
-
-        //// POST: Nodes/Delete/5
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(string id)
-        //{
-        //    if (string.IsNullOrWhiteSpace(id))
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var res = await _roleUtility.Delete(id);
-
-        //    if (res == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return RedirectToAction(nameof(Index));
-        //}
-
     }
 }

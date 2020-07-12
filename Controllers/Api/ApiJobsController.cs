@@ -34,11 +34,6 @@ namespace JobScheduler.Controllers.Api
         [HttpPost("[action]")]
         public async Task<IActionResult> Launch(LaunchJob launchJob)
         {
-            //if (!System.IO.Directory.Exists(launchJob.Path))
-            //{
-            //    return BadRequest();
-            //}
-
             DbContextUtility dbContextUtility = new DbContextUtility(_context, _configuration);
             var result = await dbContextUtility.Launch(launchJob);
 

@@ -7,7 +7,6 @@ namespace JobScheduler.Models
 {
     public class Group: IHasId
     {
-
         public int Id { get; set; }
         public string Desc { get; set; }
         public ICollection<GroupNode> GroupNodes { get; set; }

@@ -52,7 +52,6 @@ namespace JobScheduler.Controllers.Api
         [HttpPut]
         public async Task Put(JobGroupViewModel jobGroupViewModel)
         {
-            //TODO cambiare input type con JobGroup oppure usare sempre JobGroupViewModel
             await _jobGroupsUtility.Update(jobGroupViewModel);
         }
 

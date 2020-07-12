@@ -18,13 +18,10 @@ namespace JobScheduler.Controllers.Api
     [Authorize(Roles = Constants.ADMIN_ROLE, AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ApiGroupNodesController : ControllerBase
     {
-
-        private readonly JobSchedulerContext _context;
         private readonly GroupNodesUtility _groupNodesUtility;
 
         public ApiGroupNodesController(JobSchedulerContext context)
         {
-            _context = context;
             _groupNodesUtility = new GroupNodesUtility(context);
         }
 
@@ -53,7 +50,6 @@ namespace JobScheduler.Controllers.Api
         [HttpPut]
         public async Task Put(GroupNodeViewModel groupNodeViewModel)
         {
-            //TODO cambiare input type con GroupNode oppure usare sempre GroupNodeViewModel
             await _groupNodesUtility.Update(groupNodeViewModel);
         }
 
