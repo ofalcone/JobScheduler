@@ -74,58 +74,5 @@ namespace JobScheduler.Controllers
             return View();
         }
 
-        [HttpPost, Route("[controller]/[action]")]
-        public async Task<IActionResult> CreateToken([FromBody] LoginViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var user = await _userManager.FindByNameAsync(model.UserName);
-                if (user != null)
-                {
-                    if (await _userManager.CheckPasswordAsync(user, model.Password))
-                    {
-                        try
-                        {
-                            var roles = await _userManager.GetRolesAsync(user);
-                            if (roles != null && roles.Count > 0)
-                            {
-                                var tokenHandler = new JwtSecurityTokenHandler();
-                                var key = Encoding.ASCII.GetBytes(_configuration["Tokens:Key"]);
-
-                                //meta informazioni da inserire dei token jwt 
-                                var tokenDescriptor = new SecurityTokenDescriptor
-                                {
-                                    Subject = new ClaimsIdentity(new Claim[]
-                                    {
-                                        new Claim(ClaimTypes.Name, user.Id.ToString()),
-                                        new Claim(ClaimTypes.Role, roles?.FirstOrDefault())
-                                    }),
-
-                                    //se voglio che i token non scadano, possono mettere un valore molto alto
-                                    Expires = DateTime.UtcNow.AddDays(7),
-                                    //algoritmo di cifratura
-                                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-                                };
-
-                                var token = tokenHandler.CreateToken(tokenDescriptor);
-
-                                return Ok(new
-                                {
-                                    //converto oggetto tokendescri in stringa per passarla al client
-                                    Token = tokenHandler.WriteToken(token),
-                                    Expiration = token.ValidTo,
-                                });
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            throw ex;
-                        }
-                    }
-                }
-            }
-
-            return BadRequest();
-        }
     }
 }
