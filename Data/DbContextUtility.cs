@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net.Http;
@@ -51,8 +52,8 @@ namespace JobScheduler.Data
                 Node masterNode = await _context.Nodes.Where(node => node.Tipo == NodeType.Master).FirstAsync();
                 slaveJobModel.NodeId = masterNode.Id;
                 var masterLaunchResult = MasterLaunchJob(slaveJobModel, _context);
-                
-                await SaveLaunchResult(masterNode,slaveJobModel, _context,masterLaunchResult);
+
+                await SaveLaunchResult(masterNode, slaveJobModel, _context, masterLaunchResult);
                 listNodes = await _context.Nodes.ToListAsync();
                 await LaunchListNodes(slaveJobModel, listNodes, _context);
             }
@@ -162,7 +163,6 @@ namespace JobScheduler.Data
         private static JobResult MasterLaunchJob(SlaveJobModel slaveJobModel, JobSchedulerContext _context)
         {
             if (slaveJobModel == null
-                || string.IsNullOrWhiteSpace(slaveJobModel.Path)
                 || slaveJobModel.NodeId == 0)
             {
                 return null;
@@ -173,33 +173,37 @@ namespace JobScheduler.Data
             {
                 using (Process process = new Process())
                 {
-                    process.StartInfo.FileName = slaveJobModel.Path;
+                    string currentProjectPath = string.Empty;
+                    string executablePath = string.Empty;
+
+                    if (string.IsNullOrWhiteSpace(slaveJobModel.Path))
+                    {
+                        currentProjectPath = UtilityDatabase.GetApplicationRoot();
+                        executablePath = _configuration["ExecutableInfo:Path"];
+                        process.StartInfo.FileName = Path.Combine(currentProjectPath, executablePath);
+                    }
+
                     if (string.IsNullOrWhiteSpace(slaveJobModel.Argomenti) == false)
                     {
                         process.StartInfo.Arguments = $"\"{slaveJobModel.Argomenti}\"";
                     }
+
                     process.StartInfo.UseShellExecute = false;
                     process.StartInfo.RedirectStandardOutput = true;
-
                     process.OutputDataReceived += new DataReceivedEventHandler(HandleOutputData);
-                    //process.OutputDataReceived += (sender, args) => readOut = args.Data;
+
                     process.Start();
                     process.BeginOutputReadLine();
-                    //readOut = process.StandardOutput.ReadToEnd();
-
-                    //var output = new List<string>();
-
-                    //while (process.StandardOutput.Peek() > -1)
-                    //{
-                    //    output.Add(process.StandardOutput.ReadLine());
-                    //}
 
                     jobResult.Pid = process.Id;
                     jobResult.IdNode = slaveJobModel.NodeId;
+
+                    //Needed to read the output of the executable
                     if (string.IsNullOrWhiteSpace(readOut))
                     {
                         Thread.Sleep(500);
                     }
+
                     jobResult.StandardOutput = readOut;
                 }
             }
@@ -272,7 +276,7 @@ namespace JobScheduler.Data
                             stopJob.Pid = nodeLaunchResult.Pid;
                             return await ExecuteStop(nodeLaunchResult, stopJob);
                         }
-                        
+
                     }
                 }
             }
@@ -301,10 +305,10 @@ namespace JobScheduler.Data
                         var result = Newtonsoft.Json.JsonConvert.DeserializeObject<JobResult>(apiResponse);
 
                         var nodeLaunchResultFound = (from ndl in _context.NodesLaunchResults
-                                     where ndl.JobId == nodeLaunchResult.JobId
-                                     && ndl.NodeId == nodeLaunchResult.NodeId
-                                     && ndl.Pid == nodeLaunchResult.Pid
-                                     select ndl).FirstOrDefault();
+                                                     where ndl.JobId == nodeLaunchResult.JobId
+                                                     && ndl.NodeId == nodeLaunchResult.NodeId
+                                                     && ndl.Pid == nodeLaunchResult.Pid
+                                                     select ndl).FirstOrDefault();
 
                         if (nodeLaunchResultFound == null)
                         {
@@ -327,6 +331,6 @@ namespace JobScheduler.Data
             return null;
         }
 
-     
+
     }
 }

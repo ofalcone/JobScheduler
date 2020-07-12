@@ -22,12 +22,7 @@ namespace JobScheduler.Abstract
         private TContext _context;
         private IConfiguration _configuration;
         private readonly IServiceScopeFactory _scopeFactory;
-        //public MvcCrudController(TContext context, IConfiguration configuration=null)
-        //{
-        //    _context = context;
-        //    _configuration = configuration;
-        //    _genericCrud = new GenericCrud<TContext, TResource>(context);
-        //}    
+ 
         public MvcCrudController(TContext context, IServiceScopeFactory scopeFactory=null, IConfiguration configuration = null)
         {
             _context = context;
@@ -41,7 +36,6 @@ namespace JobScheduler.Abstract
             return View(await _genericCrud.GetAll());
         }
 
-        // GET: Nodes/Details/5
         public async Task<IActionResult> Details(int id)
         {
             if (id == 0)
@@ -57,29 +51,26 @@ namespace JobScheduler.Abstract
             return View(resource);
         }
 
-        // GET: Nodes/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Nodes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(TResource node)
+        public async Task<IActionResult> Create(TResource resource)
         {
             if (ModelState.IsValid)
             {
-                await _genericCrud.Create(node);
+                await _genericCrud.Create(resource);
 
-                ScheduleJob(node);
+                ScheduleJob(resource);
 
                 return RedirectToAction(nameof(Index));
             }
-            return View(node);
+            return View(resource);
         }
 
-        // GET: Nodes/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
             if (id == 0)
@@ -95,7 +86,6 @@ namespace JobScheduler.Abstract
             return View(resource);
         }
 
-        // POST: Nodes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, TResource resource)
@@ -116,7 +106,6 @@ namespace JobScheduler.Abstract
             return View(resource);
         }
 
-        // GET: Nodes/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
             if (id == 0)
@@ -133,7 +122,6 @@ namespace JobScheduler.Abstract
             return View(res);
         }
 
-        // POST: Nodes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -147,10 +135,10 @@ namespace JobScheduler.Abstract
             return RedirectToAction(nameof(Index));
         }
 
-        private void ScheduleJob(TResource node)
+        private void ScheduleJob(TResource resource)
         {
-            var job = node as Job;
-            if (node != null && _configuration != null)
+            var job = resource as Job;
+            if (resource != null && _configuration != null)
             {
                 var launchJob = new LaunchJob()
                 {

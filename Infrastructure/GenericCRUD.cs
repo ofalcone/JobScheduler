@@ -25,7 +25,6 @@ namespace JobScheduler.Infrastructure
 
         public async Task<IList<TResource>> GetAll()
         {
-            //return await Table.ToQueryResponse(query);
             return await Table.ToListAsync();
         }
 

@@ -26,7 +26,6 @@ namespace JobScheduler.Abstract
         [HttpGet]
         public async Task<IList<TResource>> GetAll()
         {
-            //return await Table.ToQueryResponse(query);
             return await _genericCrud.GetAll();
         }
 
@@ -48,7 +47,6 @@ namespace JobScheduler.Abstract
             return await _genericCrud.Create(resource);
         }
 
-        // DELETE: api/<Resource>/5
         [HttpDelete("{id}")]
         public async Task<bool> Delete(int id)
         {

@@ -68,8 +68,6 @@ namespace JobScheduler.Data
 
         private async Task<IdentityRole> CreateRoleByName(string tipoRuolo)
         {
-            //const string tipoRuolo = Constants.ADMIN_ROLE;
-
             var foundRole = await _roleManager.FindByNameAsync(tipoRuolo);
 
             if (foundRole == null)
@@ -93,16 +91,6 @@ namespace JobScheduler.Data
 
             return foundRole;
         }
-
-        //private async Task<User> CreateAdminUser()
-        //{
-        //    string userName = _configuration["AdminUserInfo:User"];
-        //    string password = _configuration["AdminUserInfo:Password"];
-        //    string firstName = _configuration["AdminUserInfo:FirstName"];
-        //    string lastname = _configuration["AdminUserInfo:LastName"];
-
-        //    return await CreateUser(userName, password, firstName, lastname);
-        //}
 
         private async Task<User> CreateUser(string userKey)
         {
@@ -143,8 +131,8 @@ namespace JobScheduler.Data
             var result = _context.Jobs.Count();
             if (result < 1)
             {
-                string currentProjectPath = UtilityDatabase.GetApplicationRoot();
-                string executablePath = "LaunchExe/test.exe";
+                string currentProjectPath = _configuration["SlaveUrls:LocalPath"];
+                string executablePath = _configuration["ExecutableInfo:Path"];
                 string executableLocation = Path.Combine(currentProjectPath, executablePath);
                 string defaultCron = "";
 
@@ -172,7 +160,7 @@ namespace JobScheduler.Data
             var result = _context.Nodes.Count();
             if (result < 1)
             {
-                Node node1 = new Node { Desc = "Master", Tipo = Enums.NodeType.Master, IndirizzoIP = "https://localhost:5001" };
+                Node node1 = new Node { Desc = "Master", Tipo = Enums.NodeType.Master, IndirizzoIP = _configuration["MasterUrl:BaseHttpsUrl"] };
                 Node node2 = new Node { Desc = "Node1", IndirizzoIP = _configuration["SlaveUrls:BaseHttpsUrl"] };
                 Node node3 = new Node { Desc = "Node2", IndirizzoIP = _configuration["SlaveUrls:BaseHttpsUrl"] };
 
@@ -229,19 +217,23 @@ namespace JobScheduler.Data
 
             if (result < 1)
             {
-                var job = listJobs.FirstOrDefault();
-                var group = listGroups.FirstOrDefault();
-                var jobGroup = new JobGroup
+                for (int i = 0; i < 2; i++)
                 {
-                    Job = job,
-                    JobId = job.Id,
-                    Group = group,
-                    GroupId = group.Id
-                };
-                _context.JobGroupes.Add(jobGroup);
-                await UtilityDatabase.TryCommit<JobGroup>(_context);
+                    var job = listJobs[i];
+                    var group = listGroups[i];
+                    var jobGroup = new JobGroup
+                    {
+                        Job = job,
+                        JobId = job.Id,
+                        Group = group,
+                        GroupId = group.Id
+                    };
+                    _context.JobGroupes.Add(jobGroup);
+                    await UtilityDatabase.TryCommit<JobGroup>(_context);
+                }
             }
         }
+
         private async Task CreateTestGroupNode(List<Group> listGroups, List<Node> listNodes)
         {
             if (listNodes == null
@@ -256,17 +248,20 @@ namespace JobScheduler.Data
 
             if (result < 1)
             {
-                var node = listNodes.FirstOrDefault();
-                var group = listGroups.FirstOrDefault();
-                var groupNode = new GroupNode
+                for (int i = 0; i < 2; i++)
                 {
-                    Group = group,
-                    GroupId = group.Id,
-                    Node = node,
-                    NodeId = node.Id
-                };
-                _context.GroupNodes.Add(groupNode);
-                await UtilityDatabase.TryCommit<GroupNode>(_context);
+                    var node = listNodes[i];
+                    var group = listGroups[i];
+                    var groupNode = new GroupNode
+                    {
+                        Group = group,
+                        GroupId = group.Id,
+                        Node = node,
+                        NodeId = node.Id
+                    };
+                    _context.GroupNodes.Add(groupNode);
+                    await UtilityDatabase.TryCommit<GroupNode>(_context);
+                }
             }
         }
     }
