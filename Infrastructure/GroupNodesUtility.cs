@@ -11,7 +11,6 @@ namespace JobScheduler.Infrastructure
 {
     public class GroupNodesUtility
     {
-
         private readonly JobSchedulerContext _context;
 
         public GroupNodesUtility(JobSchedulerContext context)
@@ -33,14 +32,8 @@ namespace JobScheduler.Infrastructure
                 return null;
             }
 
-            //bool exist = await _jobGroupsUtility.JobGroupExists(groupNode);
-
-            //groupNode.Group = await _context.Groups.FindAsync(groupNode.GroupId);
-            //groupNode.Job = await _context.Jobs.FindAsync(groupNode.NodeId);
-
             return await _context.GroupNodes.FindAsync(groupNode.GroupId, groupNode.NodeId);
         }
-
 
         internal async Task CreateSingle(GroupNode groupNode)
         {
@@ -86,5 +79,4 @@ namespace JobScheduler.Infrastructure
             await _context.SaveChangesAsync();
         }
     }
-
 }

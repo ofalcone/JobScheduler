@@ -11,7 +11,6 @@ namespace JobScheduler.Infrastructure
     public class GenericCrud<TContext, TResource> 
      where TContext : DbContext
      where TResource : class, IHasId
-     //where TQuery : Query
     {
         private readonly TContext _context;
         private DbSet<TResource> _table;

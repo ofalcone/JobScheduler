@@ -90,7 +90,10 @@ namespace JobScheduler.Abstract
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, TResource resource)
         {
-            if (id != resource.Id)
+            Node nodo = resource as Node;
+
+            //Check to avoid modifications on Master node
+            if (id != resource.Id || (nodo != null && nodo.Tipo == Enums.NodeType.Master))
             {
                 return NotFound();
             }

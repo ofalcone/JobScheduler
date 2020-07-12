@@ -13,12 +13,6 @@ namespace JobScheduler.Infrastructure
     public static class SlaveUtility<TContext>
         where TContext : JobSchedulerContext
     {
-        //private readonly JobSchedulerContext _context;
-        //public SlaveUtility(JobSchedulerContext context)
-        //{
-        //    _context = context;
-        //}
-
         internal static async Task<object> CallSlave(LaunchJob launchJob, TContext context)
         {
             string slaveURl = string.Format("https://localhost:5004/api/JobExe");
@@ -30,7 +24,7 @@ namespace JobScheduler.Infrastructure
                 IdNodeList = new List<int> { 1, 2, 3 }
 
             };
-            
+
             try
             {
                 using (var httpClient = new System.Net.Http.HttpClient())

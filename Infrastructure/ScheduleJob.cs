@@ -28,7 +28,7 @@ namespace JobScheduler.Infrastructure
         // }
 
         public ScheduleJob(string cronExpression, TimeZoneInfo timeZoneInfo, LaunchJob launchJob, IServiceScopeFactory scopeFactory, IConfiguration configuration)
-   : base(cronExpression, timeZoneInfo)
+        : base(cronExpression, timeZoneInfo)
         {
             _scopeFactory = scopeFactory;
             _configuration = configuration;
@@ -36,12 +36,6 @@ namespace JobScheduler.Infrastructure
             StartAsync(CancellationToken.None, launchJob);
         }
 
-        //public ScheduleJob(string cronExpression, TimeZoneInfo timeZoneInfo, int id, string path) 
-        //    : this(cronExpression, timeZoneInfo)
-        //{
-        //    this.id = id;
-        //    this.path = path;
-        //}
         public override Task StartAsync(CancellationToken cancellationToken, LaunchJob launchJob)
         {
             return base.StartAsync(cancellationToken, launchJob);
@@ -49,12 +43,9 @@ namespace JobScheduler.Infrastructure
 
         public override async Task DoWork(CancellationToken cancellationToken, LaunchJob launchJob)
         {
-            //return base.DoWork(cancellationToken);
-            //TODO: capire come lanciare il job usando dbContextUtility.Launch
-            
             using (var scope = _scopeFactory.CreateScope())
             {
-                var dbcontext= scope.ServiceProvider.GetRequiredService<JobSchedulerContext>();
+                var dbcontext = scope.ServiceProvider.GetRequiredService<JobSchedulerContext>();
                 DbContextUtility dbContextUtility = new DbContextUtility(dbcontext, _configuration);
                 await dbContextUtility.Launch(launchJob);
             }

@@ -33,14 +33,8 @@ namespace JobScheduler.Infrastructure
                 return null;
             }
 
-            //bool exist = await _jobGroupsUtility.JobGroupExists(jobGroup);
-
-            //jobGroup.Group = await _context.Groups.FindAsync(jobGroup.GroupId);
-            //jobGroup.Job = await _context.Jobs.FindAsync(jobGroup.JobId);
-
             return await _context.JobGroupes.FindAsync(jobGroup.JobId,jobGroup.GroupId);
         }
-
 
         internal async Task CreateSingle(JobGroup jobGroup)
         {
@@ -52,7 +46,6 @@ namespace JobScheduler.Infrastructure
         {
             return await _context.JobGroupes.AnyAsync(e => e.JobId == jobGroup.JobId && e.GroupId == jobGroup.GroupId);
         }
-
 
         internal async Task Update(JobGroupViewModel jobGroupViewModel)
         {
