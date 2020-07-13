@@ -174,7 +174,7 @@ namespace JobScheduler.Data
                     //Added to ensure execution of HandleOutputData
                     if (string.IsNullOrWhiteSpace(readOut))
                     {
-                        Thread.Sleep(200);
+                        Thread.Sleep(300);
                     }
 
                     jobResult.StandardOutput = readOut;
@@ -325,7 +325,7 @@ namespace JobScheduler.Data
                     //Added to ensure execution of ProcessEnded
                     if (exitCode == -999)
                     {
-                        Thread.Sleep(200);
+                        Thread.Sleep(300);
                     }
 
                     jobResult = new JobResult
