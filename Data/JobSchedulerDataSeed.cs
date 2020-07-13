@@ -106,18 +106,18 @@ namespace JobScheduler.Data
         /// <returns>User if created, else null </returns>
         private async Task<User> CreateUser(string userKey)
         {
-            string userName = _configuration[$"{userKey}Info:User"];
+            string email = _configuration[$"{userKey}Info:Email"];
             string password = _configuration[$"{userKey}Info:Password"];
             string firstName = _configuration[$"{userKey}Info:FirstName"];
             string lastname = _configuration[$"{userKey}Info:LastName"];
 
-            User user = await _userManager.FindByEmailAsync(userName);
+            User user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
                 user = new User
                 {
-                    UserName = userName,
-                    Email = userName,
+                    UserName = email,
+                    Email = email,
                     FirstName = firstName,
                     LastName = lastname,
                 };
