@@ -171,10 +171,10 @@ namespace JobScheduler.Data
                     jobResult.Pid = process.Id;
                     jobResult.IdNode = slaveJobModel.NodeId;
 
-                    //Needed to read the output of the executable
+                    //Added to ensure execution of HandleOutputData
                     if (string.IsNullOrWhiteSpace(readOut))
                     {
-                        Thread.Sleep(500);
+                        Thread.Sleep(200);
                     }
 
                     jobResult.StandardOutput = readOut;
@@ -322,6 +322,12 @@ namespace JobScheduler.Data
 
                 if (processFound != null)
                 {
+                    //Added to ensure execution of ProcessEnded
+                    if (exitCode == -999)
+                    {
+                        Thread.Sleep(200);
+                    }
+
                     jobResult = new JobResult
                     {
                         Pid = stopJob.Pid,

@@ -143,6 +143,11 @@ namespace JobScheduler.Abstract
             var job = resource as Job;
             if (resource != null && _configuration != null)
             {
+                if (string.IsNullOrWhiteSpace(job.Orario) || string.IsNullOrWhiteSpace(job.Path))
+                {
+                    return;
+                }
+
                 var launchJob = new LaunchJob()
                 {
                     Id = job.Id,

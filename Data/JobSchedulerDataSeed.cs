@@ -149,14 +149,16 @@ namespace JobScheduler.Data
             var result = _context.Jobs.Count();
             if (result < 1)
             {
-                string currentProjectPath = _configuration["SlaveUrls:LocalPath"];
+                string slaveProjectPath = _configuration["SlaveUrls:LocalPath"];
+                string masterProjectPath = UtilityDatabase.GetApplicationRoot();
                 string executablePath = _configuration["ExecutableInfo:Path"];
-                string executableLocation = Path.Combine(currentProjectPath, executablePath);
+                string slaveExecutableLocation = Path.Combine(slaveProjectPath, executablePath);
+                string masterExecutableLocation = Path.Combine(masterProjectPath, executablePath);
                 string defaultCron = "";
 
-                Job job1 = new Job { Orario = defaultCron, Path = executableLocation, Description = "test master", Argomenti = "test master" };
-                Job job2 = new Job { Orario = defaultCron, Path = executableLocation, Description = "test job 1", Argomenti = "test job 1" };
-                Job job3 = new Job { Orario = defaultCron, Path = executableLocation, Description = "test job 2", Argomenti = "test job 2" };
+                Job job1 = new Job { Orario = defaultCron, Path = masterExecutableLocation, Description = "test master", Argomenti = "test master" };
+                Job job2 = new Job { Orario = defaultCron, Path = slaveExecutableLocation, Description = "test job 1", Argomenti = "test job 1" };
+                Job job3 = new Job { Orario = defaultCron, Path = slaveExecutableLocation, Description = "test job 2", Argomenti = "test job 2" };
 
                 _context.Jobs.AddRange(job1, job2, job3);
 
